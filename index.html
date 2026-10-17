@@ -168,14 +168,8 @@ function makeNameGen(seed) {
     };
 }
 
-// Escape de string Lua
-function luaStr(s) {
-    return '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
-}
-
 // ============================================================
-// Tokenizer simples de Luau (para string / número / ident / op)
+// Tokenizer (com suporte a comentários de bloco --[[ ... ]])
 // ============================================================
 function tokenize(code) {
     const tokens = [];
@@ -197,12 +191,29 @@ function tokenize(code) {
             continue;
         }
 
-        // comentário de linha
+        // comentário de linha ou bloco
         if (c === '-' && code[i + 1] === '-') {
-            let j = i;
-            while (j < n && code[j] !== '\n') j++;
-            tokens.push({ t: 'comment', v: code.slice(i, j) });
-            i = j;
+            let j = i + 2;
+            let level = 0;
+            if (code[j] === '[') {
+                let k = j + 1;
+                while (code[k] === '=') { level++; k++; }
+                if (code[k] === '[') {
+                    // bloco --[[ ... ]] ou --[=[ ... ]=]
+                    const close = ']' + '='.repeat(level) + ']';
+                    let end = code.indexOf(close, k + 1);
+                    if (end === -1) end = n;
+                    else end += close.length;
+                    tokens.push({ t: 'comment', v: code.slice(i, end) });
+                    i = end;
+                    continue;
+                }
+            }
+            // linha normal
+            let end = i;
+            while (end < n && code[end] !== '\n') end++;
+            tokens.push({ t: 'comment', v: code.slice(i, end) });
+            i = end;
             continue;
         }
 
@@ -243,7 +254,7 @@ function tokenize(code) {
             continue;
         }
 
-        // operadores (2 chars primeiro)
+        // operadores
         const two = code.slice(i, i + 2);
         const ops2 = ['==', '~=', '<=', '>=', '..', '->', '::', '//', '<<', '>>'];
         if (ops2.includes(two)) {
@@ -263,27 +274,23 @@ function tokenize(code) {
 function ofuscar(code) {
     if (!code.trim()) throw new Error("Código vazio.");
 
-    // 1. Tokeniza
     const tokens = tokenize(code);
 
-    // 2. Seed
     let seed = 7;
     for (let i = 0; i < code.length; i++) seed = (Math.imul(seed, 31) + code.charCodeAt(i)) >>> 0;
     if (seed === 0) seed = 1;
     const rng = makeRNG(seed);
     const novoNome = makeNameGen(seed ^ 0x9E3779B9);
 
-    // 3. Mapeia identificadores do usuário para nomes novos
-    //    (exceto palavras reservadas e globais conhecidas)
     const RESERVED = new Set([
         'and','break','do','else','elseif','end','false','for','function','if','in',
         'local','nil','not','or','repeat','return','then','true','until','while',
-        'continue','type','export','typeof','self','game','workspace','script',
-        'Instance','Vector3','Vector2','CFrame','Color3','BrickColor','UDim','UDim2',
-        'Enum','Ray','Region3','NumberRange','NumberSequence','ColorSequence',
-        'Rect','TweenInfo','Faces','Axes','PhysicalProperties','Random','task',
-        'wait','spawn','delay','tick','time','print','warn','error','assert','pcall',
-        'xpcall','select','type','tostring','tonumber','setmetatable','getmetatable',
+        'continue','type','export','typeof','self',
+        'game','workspace','script','Instance','Vector3','Vector2','CFrame','Color3',
+        'BrickColor','UDim','UDim2','Enum','Ray','Region3','NumberRange','NumberSequence',
+        'ColorSequence','Rect','TweenInfo','Faces','Axes','PhysicalProperties','Random',
+        'task','wait','spawn','delay','tick','time','print','warn','error','assert',
+        'pcall','xpcall','select','tostring','tonumber','setmetatable','getmetatable',
         'rawget','rawset','rawequal','rawlen','next','pairs','ipairs','unpack',
         'table','string','math','os','io','coroutine','bit32','utf8','debug',
         'loadstring','load','require','getfenv','setfenv','getgenv','getrenv',
@@ -295,30 +302,25 @@ function ofuscar(code) {
         'getconnections','firesignal','fireclickdetector','firetouchtransmitter',
         'getcustomasset','gethui','getinstances','getnilinstances','getloadedmodules',
         'getscripts','getcallingscript','getsenv','getreg','setclipboard',
-        'toclipboard','request','http_request','syn_request','HttpGet','game'
+        'toclipboard','request','http_request','syn_request','HttpGet',
+        'BodyVelocity','MaxForce','Velocity','HumanoidRootPart','Heartbeat',
+        'RunService','Players','LocalPlayer','Character','CharacterAdded',
+        'WaitForChild','Parent','Connect','new'
     ]);
 
     const mapa = new Map();
     for (const tk of tokens) {
         if (tk.t === 'id' && !RESERVED.has(tk.v) && !mapa.has(tk.v)) {
-            // só renomeia se for local (heurística: aparece após 'local')
             mapa.set(tk.v, novoNome());
         }
     }
 
-    // 4. Reconstrói com camadas de ofuscação
-    const out = [];
-    let depth = 0;
-    let deadCounter = 0;
-
-    // helpers para número ofuscado
     function numOfuscado(n) {
         const a = (rng() % 300) + 1;
         const b = a + n;
         return `(${b}-${a})`;
     }
 
-    // helper para string ofuscada (XOR + rotação por char)
     function strOfuscada(s) {
         if (s.length === 0) return '""';
         const key = (rng() % 200) + 20;
@@ -330,52 +332,28 @@ function ofuscar(code) {
             v = ((v << rot) | (v >>> (8 - rot))) & 0xFF;
             bytes.push(v);
         }
-        // gera: (function() local t={...}; local r={}; local k=...; for i=1,#t do local v=(t[i]>>rot)|(t[i]<<(8-rot)); v=(v-key)&255; r[i]=string.char(v) end; return table.concat(r) end)()
         const tn = novoNome();
         const rn = novoNome();
         const kn = novoNome();
         const iname = novoNome();
         const vn = novoNome();
-        return `(function() local ${tn}={${bytes.join(',')}} local ${rn}={} local ${kn}=${numOfuscado(key)} local ${iname}=1 for ${iname}=1,#${tn} do local ${vn}=${tn}[${iname}] ${vn}=bit32.bor(bit32.rshift(${vn},${numOfuscado(rot)}),bit32.lshift(${vn},${numOfuscado(8-rot)})) ${vn}=bit32.band(${vn}-${kn},255) ${rn}[${iname}]=string.char(${vn}) end return table.concat(${rn}) end)()`;
+        return `(function() local ${tn}={${bytes.join(',')}} local ${rn}={} local ${kn}=${numOfuscado(key)} for ${iname}=1,#${tn} do local ${vn}=${tn}[${iname}] ${vn}=bit32.bor(bit32.rshift(${vn},${numOfuscado(rot)}),bit32.lshift(${vn},${numOfuscado(8-rot)})) ${vn}=bit32.band(${vn}-${kn},255) ${rn}[${iname}]=string.char(${vn}) end return table.concat(${rn}) end)()`;
     }
 
-    // 5. Gera código final
     const lines = [];
     lines.push('-- [[ Power X Hub v1 ]]');
-    lines.push('-- Ofuscado localmente. Luau válido.');
+    lines.push('local bit32 = bit32 or bit');
 
-    // anti-tamper: checksum simples
-    let checksum = 0;
-    for (let i = 0; i < code.length; i++) checksum = (Math.imul(checksum, 131) + code.charCodeAt(i)) >>> 0;
-    const chkName = novoNome();
-    lines.push(`local ${chkName} = ${numOfuscado(checksum)}`);
-
-    // 6. Reconstrói tokens com renomeação + ofuscação
     let line = '';
-    const push = (s) => { line += s; };
-
     for (let i = 0; i < tokens.length; i++) {
         const tk = tokens[i];
-
-        if (tk.t === 'comment') {
-            // remove comentários
-            continue;
-        }
-        if (tk.t === 'ws') {
-            line += tk.v;
-            if (tk.v.includes('\n')) {
-                // mantém quebras de linha
-            }
-            continue;
-        }
-        if (tk.t === 'str') {
-            line += strOfuscada(tk.v);
-            continue;
-        }
+        if (tk.t === 'comment') continue;
+        if (tk.t === 'ws') { line += tk.v; continue; }
+        if (tk.t === 'str') { line += strOfuscada(tk.v); continue; }
         if (tk.t === 'num') {
-            // evita ofuscar 0/1 em contextos delicados, mas ofusca a maioria
             const num = parseFloat(tk.v);
-            if (!isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000 && tk.v.indexOf('x') < 0 && tk.v.indexOf('X') < 0 && tk.v.indexOf('.') < 0) {
+            if (!isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000
+                && tk.v.indexOf('x') < 0 && tk.v.indexOf('X') < 0 && tk.v.indexOf('.') < 0) {
                 line += numOfuscado(num);
             } else {
                 line += tk.v;
@@ -383,32 +361,19 @@ function ofuscar(code) {
             continue;
         }
         if (tk.t === 'id') {
-            if (mapa.has(tk.v) && tk.v !== 'self') {
-                line += mapa.get(tk.v);
-            } else {
-                line += tk.v;
-            }
+            if (mapa.has(tk.v) && tk.v !== 'self') line += mapa.get(tk.v);
+            else line += tk.v;
             continue;
         }
         line += tk.v;
     }
 
-    // 7. Quebra em pedaços e achatamento leve de fluxo
-    //    (insere blocos dead code a cada X tokens)
     lines.push(line);
 
-    // 8. Dead code: blocos if false
     for (let d = 0; d < 3; d++) {
         const dn = novoNome();
         lines.push(`if false then local ${dn} = ${numOfuscado(rng() % 1000)} end`);
     }
-
-    // 9. Verificação anti-tamper
-    const finalChk = novoNome();
-    const finalSum = novoNome();
-    lines.push(`local ${finalSum} = 0`);
-    lines.push(`local ${finalChk} = ${chkName}`);
-    lines.push(`if ${finalSum} ~= 0 then error("tamper") end`);
 
     return lines.join('\n');
 }
@@ -443,7 +408,7 @@ function compilar() {
         const out = ofuscar(codigo);
         outCode.value = out;
         outCount.textContent = out.length;
-        mostrarAlerta('✅ Ofuscado com sucesso! Copie e cole no executor.', 'info', 5000);
+        mostrarAlerta('✅ Ofuscado com sucesso!', 'info', 5000);
     } catch (e) {
         mostrarAlerta('Erro: ' + e.message, 'error');
     }
@@ -464,17 +429,9 @@ function limpar() {
     alertDiv.className = 'alert';
 }
 
-// Script padrão
-srcCode.value = `-- Exemplo: Fly simples
+srcCode.value = `-- Exemplo
 local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local root = char:WaitForChild("HumanoidRootPart")
-local bv = Instance.new("BodyVelocity")
-bv.MaxForce = Vector3.new(1e6,1e6,1e6)
-bv.Parent = root
-game:GetService("RunService").Heartbeat:Connect(function()
-    bv.Velocity = Vector3.new(0,10,0)
-end)`;
+print("Hello, " .. player.Name)`;
 charCount.textContent = srcCode.value.length;
 </script>
 </body>
