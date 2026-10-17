@@ -1,498 +1,354 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚡ Power X Hub · VM Obfuscator v5 (Offline)</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #090b11; color: #e2e8f0;
-            min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
-        .container { width: 100%; max-width: 960px; margin: 0 auto; }
-        .card {
-            background: linear-gradient(145deg, #141823, #0d1019);
-            border-radius: 28px; padding: 38px 34px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
-            transition: box-shadow 0.3s;
-        }
-        .card:hover { box-shadow: 0 35px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,255,183,0.15); }
-        .header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header .icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(0,255,183,0.25)); }
-        .header h1 {
-            font-size: 27px; font-weight: 700;
-            background: linear-gradient(135deg, #00ffb7, #00b894);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            letter-spacing: -0.3px;
-        }
-        .header .tag { margin-left: auto; background: rgba(0,255,183,0.08); color: #00ffb7; font-size: 11px; font-weight: 600; padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(0,255,183,0.15); text-transform: uppercase; letter-spacing: 0.8px; }
-        .alert { padding: 14px 20px; border-radius: 16px; background: rgba(0,255,183,0.05); border: 1px solid rgba(0,255,183,0.15); color: #00ffb7; font-size: 14px; font-weight: 500; display: none; align-items: center; gap: 12px; margin-bottom: 24px; animation: fadeSlide 0.3s ease; }
-        .alert.show { display: flex; }
-        .alert.error { background: rgba(255,71,87,0.07); border-color: rgba(255,71,87,0.2); color: #ff6b7a; }
-        .alert .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(0,255,183,0.15); border-top-color: #00ffb7; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeSlide { 0% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 1; transform: translateY(0); } }
-        .field { margin-bottom: 22px; }
-        .field label { display: block; font-size: 14px; font-weight: 600; color: #b6c2d4; margin-bottom: 8px; letter-spacing: 0.2px; }
-        .field label .emoji { margin-right: 8px; }
-        textarea, input[type="text"] { width: 100%; padding: 14px 18px; background: #0b0e16; border: 1px solid #232d3e; border-radius: 14px; color: #dce4f0; font-family: 'Cascadia Code','Consolas','Fira Code',monospace; font-size: 14px; line-height: 1.6; transition: border-color 0.25s, box-shadow 0.25s; resize: vertical; }
-        textarea:focus, input[type="text"]:focus { outline: none; border-color: #00ffb7; box-shadow: 0 0 0 3px rgba(0,255,183,0.06); }
-        textarea::placeholder, input::placeholder { color: #3d4a5e; }
-        textarea { min-height: 140px; }
-        textarea[readonly], input[readonly] { background: #080b12; color: #8b9bb0; }
-        .char-counter { text-align: right; font-size: 12px; color: #4a5a6e; margin-top: 5px; padding-right: 4px; }
-        .inline-link { display: flex; gap: 12px; align-items: center; background: #0b0e16; padding: 6px 14px 6px 18px; border-radius: 14px; border: 1px solid #1e2a3a; margin-top: 6px; }
-        .inline-link input { flex: 1; border: none; background: transparent; padding: 10px 0; color: #00ffb7; font-size: 14px; font-family: monospace; }
-        .inline-link input:focus { box-shadow: none; }
-        .inline-link .copy-mini { background: #1e293b; border: none; color: #cbd5e1; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.15s; }
-        .inline-link .copy-mini:hover { background: #2d3a4f; color: #fff; }
-        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 24px; }
-        .btn { flex: 1 1 160px; padding: 15px 22px; border: none; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s ease; background: #1f2937; color: #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
-        .btn:active { transform: translateY(0px); }
-        .btn-primary { background: linear-gradient(135deg, #00ffb7, #00b380); color: #0a0c12; }
-        .btn-primary:hover { box-shadow: 0 8px 30px rgba(0,255,183,0.3); }
-        .btn-secondary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
-        .btn-secondary:hover { box-shadow: 0 8px 30px rgba(168,85,247,0.3); }
-        .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
-        .btn-outline:hover { background: #1e293b; border-color: #00ffb7; }
-        .btn:disabled { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
-        .footer { margin-top: 30px; text-align: center; font-size: 13px; color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 24px; }
-        .footer a { color: #00ffb7; text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
-        @media (max-width: 650px) {
-            .card { padding: 24px 16px; }
-            .header h1 { font-size: 20px; }
-            .btn { flex: 1 1 100%; }
-            .header .tag { display: none; }
-            .inline-link { flex-wrap: wrap; }
-            .inline-link input { width: 100%; }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>⚡ Power X Hub · Fortress Obfuscator</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #090b11; color: #e2e8f0;
+    min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
+}
+.container { width: 100%; max-width: 960px; margin: 0 auto; }
+.card {
+    background: linear-gradient(145deg, #141823, #0d1019);
+    border-radius: 28px; padding: 38px 34px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
+    transition: box-shadow 0.3s;
+}
+.card:hover { box-shadow: 0 35px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,255,183,0.15); }
+.header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.header .icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(0,255,183,0.25)); }
+.header h1 {
+    font-size: 27px; font-weight: 700;
+    background: linear-gradient(135deg, #ff0055, #ff8800);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -0.3px;
+}
+.header .tag { margin-left: auto; background: rgba(255,0,85,0.08); color: #ff0055; font-size: 11px; font-weight: 600; padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(255,0,85,0.15); text-transform: uppercase; letter-spacing: 0.8px; }
+.alert { padding: 14px 20px; border-radius: 16px; background: rgba(255,0,85,0.05); border: 1px solid rgba(255,0,85,0.15); color: #ff0055; font-size: 14px; font-weight: 500; display: none; align-items: center; gap: 12px; margin-bottom: 24px; }
+.alert.show { display: flex; }
+.alert.error { background: rgba(255,71,87,0.07); border-color: rgba(255,71,87,0.2); color: #ff6b7a; }
+.alert .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(255,0,85,0.15); border-top-color: #ff0055; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.field { margin-bottom: 22px; }
+.field label { display: block; font-size: 14px; font-weight: 600; color: #b6c2d4; margin-bottom: 8px; }
+textarea, input[type="text"] { width: 100%; padding: 14px 18px; background: #0b0e16; border: 1px solid #232d3e; border-radius: 14px; color: #dce4f0; font-family: 'Cascadia Code','Consolas',monospace; font-size: 14px; line-height: 1.6; resize: vertical; }
+textarea:focus, input[type="text"]:focus { outline: none; border-color: #ff0055; }
+textarea[readonly] { background: #080b12; color: #8b9bb0; }
+.char-counter { text-align: right; font-size: 12px; color: #4a5a6e; margin-top: 5px; }
+.inline-link { display: flex; gap: 12px; align-items: center; background: #0b0e16; padding: 6px 14px 6px 18px; border-radius: 14px; border: 1px solid #1e2a3a; margin-top: 6px; }
+.inline-link input { flex: 1; border: none; background: transparent; padding: 10px 0; color: #ff0055; font-size: 14px; font-family: monospace; }
+.inline-link .copy-mini { background: #1e293b; border: none; color: #cbd5e1; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 24px; }
+.btn { flex: 1 1 160px; padding: 15px 22px; border: none; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; background: #1f2937; color: #e2e8f0; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
+.btn-primary { background: linear-gradient(135deg, #ff0055, #ff8800); color: #fff; }
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(255,0,85,0.3); }
+.btn-secondary { background: #334155; color: #fff; }
+.btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
+.footer { margin-top: 30px; text-align: center; font-size: 13px; color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 24px; }
+.footer a { color: #ff0055; text-decoration: none; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <span class="icon">⚡</span>
-                <h1>Power X Hub</h1>
-                <span class="tag">VM Obfuscator v5 (Offline)</span>
-            </div>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <span class="icon">🔥</span>
+            <h1>Power X Hub</h1>
+            <span class="tag">Fortress Obfuscator</span>
+        </div>
 
-            <div id="alert" class="alert">
-                <span id="alertIcon">✅</span>
-                <span id="alertMsg">Pronto!</span>
-            </div>
+        <div id="alert" class="alert">
+            <span id="alertIcon">✅</span>
+            <span id="alertMsg">Pronto!</span>
+        </div>
 
-            <div class="field">
-                <label><span class="emoji">📄</span> Código Original Luau</label>
-                <textarea id="srcCode" placeholder="-- Cole seu script aqui..." rows="6"></textarea>
-                <div class="char-counter"><span id="charCount">0</span> caracteres</div>
-            </div>
+        <div class="field">
+            <label>📄 Código Original Luau</label>
+            <textarea id="srcCode" placeholder="-- Cole seu script aqui..." rows="6"></textarea>
+            <div class="char-counter"><span id="charCount">0</span> caracteres</div>
+        </div>
 
-            <div class="actions">
-                <button class="btn btn-primary" id="btnPublish" onclick="compilarEPublicar()">
-                    <span>🚀</span> Compilar &amp; Publicar
-                </button>
-                <button class="btn btn-secondary" onclick="gerarLoadstringManual()">
-                    <span>🔗</span> Gerar Loadstring (Manual)
-                </button>
-                <button class="btn btn-outline" onclick="copiarResultado()">
-                    <span>📋</span> Copiar Loadstring
-                </button>
-            </div>
+        <div class="actions">
+            <button class="btn btn-primary" onclick="compilarEPublicar()">
+                <span>🚀</span> Compilar & Publicar
+            </button>
+            <button class="btn btn-secondary" onclick="gerarLoadstringManual()">
+                <span>🔗</span> Gerar Loadstring
+            </button>
+            <button class="btn btn-outline" onclick="copiarResultado()">
+                <span>📋</span> Copiar Resultado
+            </button>
+        </div>
 
-            <div class="field">
-                <label><span class="emoji">🔗</span> Link Raw (pode colar manualmente)</label>
-                <div class="inline-link">
-                    <input type="text" id="rawLink" placeholder="https://pastebin.com/raw/..." />
-                    <button class="copy-mini" onclick="copiarLink()">Copiar</button>
-                </div>
-                <div style="font-size:12px; color:#4a5a6e; margin-top:6px;">
-                    Se a publicação automática falhar, copie o código ofuscado (abaixo) e cole no Pastebin,
-                    depois cole o link raw aqui e clique em "Gerar Loadstring (Manual)".
-                </div>
-            </div>
-
-            <div class="field">
-                <label><span class="emoji">🔐</span> Código Ofuscado (para fallback)</label>
-                <textarea id="ofuscado" readonly placeholder="O código ofuscado aparecerá aqui..." rows="4"></textarea>
-            </div>
-
-            <div class="field" style="margin-bottom:0;">
-                <label><span class="emoji">📦</span> Script Final (com loadstring)</label>
-                <textarea id="outCode" readonly placeholder="O loadstring final será gerado aqui..." rows="3"></textarea>
-            </div>
-
-            <div class="footer">
-                🔒 Ofuscação local VM v5 (sem API externa).<br />
-                Publicação via <a href="https://keybin.io" target="_blank">Keybin</a>.
+        <div class="field">
+            <label>🔗 Link Raw (se quiser colar manualmente)</label>
+            <div class="inline-link">
+                <input type="text" id="rawLink" placeholder="https://pastebin.com/raw/..." />
+                <button class="copy-mini" onclick="copiarLink()">Copiar</button>
             </div>
         </div>
+
+        <div class="field">
+            <label>🔐 Código Ofuscado (Fortress)</label>
+            <textarea id="ofuscado" readonly placeholder="Código Fortress aparecerá aqui..." rows="4"></textarea>
+        </div>
+
+        <div class="field" style="margin-bottom:0;">
+            <label>📦 Script Final (Loadstring)</label>
+            <textarea id="outCode" readonly placeholder="O loadstring final..." rows="3"></textarea>
+        </div>
+
+        <div class="footer">
+            🔒 Ofuscação polimórfica com VM + Cifra de Chave Polinomial.<br />
+            Publicação via <a href="https://keybin.io" target="_blank">Keybin</a>.
+        </div>
     </div>
+</div>
 
-    <script>
-        // ============================================================
-        // 1. COMPILADOR DE BYTECODE (O CÉREBRO DA VM)
-        // ============================================================
-        // Mapeamento de instruções para opcodes numéricos.
-        // Isso transforma o Lua em uma "linguagem de máquina" falsa.
-        const OPCODES = {
-            'LOADK': 1,    // Carrega constante (string, número)
-            'GETGLOBAL': 2,// Pega global (game, workspace, etc)
-            'GETTABLE': 3, // Pega índice em tabela (obj.Prop)
-            'SETGLOBAL': 4,// Define global
-            'CALL': 5,     // Chama função
-            'RETURN': 6,   // Retorna
-            'ADD': 7,      // Soma
-            'SUB': 8,      // Subtração
-            'MUL': 9,      // Multiplicação
-            'DIV': 10,     // Divisão
-            'EQ': 11,      // Igualdade
-            'LT': 12,      // Menor que
-            'LE': 13,      // Menor ou igual
-            'JMP': 14,     // Pulo incondicional
-            'JMPIF': 15,   // Pulo condicional
-            'NEWTABLE': 16,// Cria tabela
-            'SETTABLE': 17,// Define índice em tabela
-            'CLOSURE': 18, // Cria função
-            'VARARGS': 19, // ...
-            'CONCAT': 20,  // Concatenação de string (..)
-            'LEN': 21,     // Tamanho (#)
-            'NOT': 22,     // Negação (not)
-            'NEG': 23      // Negativo (-)
-        };
+<script>
+// ============================================================
+// 1. COMPILADOR DE BYTECODE (Motor da VM)
+// ============================================================
+const OPCODES = {
+    'LOADK': 1, 'GETGLOBAL': 2, 'SETGLOBAL': 3, 'CALL': 4,
+    'RETURN': 5, 'ADD': 6, 'SUB': 7, 'MUL': 8, 'DIV': 9
+};
 
-        // Tabela de strings constantes (para não salvar texto legível no bytecode)
-        let constantTable = [];
+let constantTable = [];
+function addConstant(val) {
+    if (typeof val === 'number') return val;
+    let idx = constantTable.indexOf(val);
+    if (idx === -1) { idx = constantTable.length; constantTable.push(val); }
+    return idx;
+}
 
-        function addConstant(val) {
-            if (typeof val === 'number') return val;
-            let idx = constantTable.indexOf(val);
-            if (idx === -1) {
-                idx = constantTable.length;
-                constantTable.push(val);
+function tokenize(code) {
+    const tokens = [];
+    // Remove comentários para não quebrar o parser
+    code = code.replace(/--\[\[[\s\S]*?\]\]/g, '').replace(/--[^\n]*/g, '');
+    const regex = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\d+\.?\d*|\w+|[+\-*\/=<>~#{}()\[\];:,.])/g;
+    let match;
+    while ((match = regex.exec(code)) !== null) {
+        let val = match[0];
+        if (val.startsWith('"') || val.startsWith("'")) tokens.push({ type: 'string', value: val.slice(1, -1) });
+        else if (/^\d/.test(val)) tokens.push({ type: 'number', value: parseFloat(val) });
+        else if (/^[a-zA-Z_]/.test(val)) tokens.push({ type: 'identifier', value: val });
+        else tokens.push({ type: 'symbol', value: val });
+    }
+    return tokens;
+}
+
+function compileToBytecode(code) {
+    constantTable = [];
+    const tokens = tokenize(code);
+    const bytecode = [];
+    let i = 0;
+    while (i < tokens.length) {
+        const t = tokens[i];
+        if (t.type === 'identifier') {
+            // Chamada de função
+            if (i+1 < tokens.length && tokens[i+1].value === '(') {
+                bytecode.push(OPCODES.GETGLOBAL, addConstant(t.value));
+                i += 2;
+                let args = 0, depth = 1;
+                while (i < tokens.length && depth > 0) {
+                    if (tokens[i].value === '(') depth++;
+                    if (tokens[i].value === ')') depth--;
+                    if (depth > 0 && (tokens[i].type === 'identifier' || tokens[i].type === 'string' || tokens[i].type === 'number')) {
+                        bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
+                        args++;
+                    }
+                    i++;
+                }
+                bytecode.push(OPCODES.CALL, args);
+                continue;
             }
-            return idx;
-        }
-
-        // Parser super simplificado de Lua (não 100% completo, mas quebra o galho)
-        function tokenize(code) {
-            const tokens = [];
-            const regex = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\d+\.?\d*|\w+|[+\-*\/=<>~#{}()\[\];:,.])/g;
-            let match;
-            while ((match = regex.exec(code)) !== null) {
-                let val = match[0];
-                if (val.startsWith('"') || val.startsWith("'")) {
-                    tokens.push({ type: 'string', value: val.slice(1, -1) });
-                } else if (/^\d/.test(val)) {
-                    tokens.push({ type: 'number', value: parseFloat(val) });
-                } else if (/^[a-zA-Z_]/.test(val)) {
-                    if (['local', 'function', 'if', 'then', 'else', 'end', 'return', 'for', 'while', 'do'].includes(val)) {
-                        tokens.push({ type: 'keyword', value: val });
-                    } else {
-                        tokens.push({ type: 'identifier', value: val });
-                    }
-                } else {
-                    tokens.push({ type: 'symbol', value: val });
-                }
-            }
-            return tokens;
-        }
-
-        // Compila a AST para bytecode da VM
-        function compileToBytecode(code) {
-            constantTable = []; // Reseta para cada compilação
-            const tokens = tokenize(code);
-            const bytecode = [];
-            
-            // Simplificação: pula declarações de função e var e vai direto pro "código solto"
-            // Isso não é um compilador Lua real, mas é o suficiente para ofuscar.
-            // O objetivo é não deixar o texto legível.
-
-            let i = 0;
-            while (i < tokens.length) {
-                const t = tokens[i];
-                
-                if (t.type === 'identifier') {
-                    // Se for uma chamada de função: identifier(...)
-                    if (i+1 < tokens.length && tokens[i+1].value === '(') {
-                        bytecode.push(OPCODES.GETGLOBAL, addConstant(t.value));
-                        i += 2; // pula o '('
-                        // Processa argumentos (simplificado)
-                        let args = 0;
-                        let depth = 1;
-                        while (i < tokens.length && depth > 0) {
-                            if (tokens[i].value === '(') depth++;
-                            if (tokens[i].value === ')') depth--;
-                            if (depth > 0 && tokens[i].type === 'identifier') {
-                                bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
-                                args++;
-                            } else if (tokens[i].type === 'string') {
-                                bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
-                                args++;
-                            } else if (tokens[i].type === 'number') {
-                                bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
-                                args++;
-                            }
-                            i++;
-                        }
-                        bytecode.push(OPCODES.CALL, args);
-                        continue;
-                    }
-                    
-                    // Se for atribuição: identifier = ...
-                    if (i+1 < tokens.length && tokens[i+1].value === '=') {
-                        bytecode.push(OPCODES.SETGLOBAL, addConstant(t.value));
-                        i += 2;
-                        // Processa o valor (super simplificado)
-                        if (tokens[i] && tokens[i].type === 'string') {
-                            bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
-                        } else if (tokens[i] && tokens[i].type === 'number') {
-                            bytecode.push(OPCODES.LOADK, tokens[i].value);
-                        } else if (tokens[i] && tokens[i].type === 'identifier') {
-                            bytecode.push(OPCODES.GETGLOBAL, addConstant(tokens[i].value));
-                        }
-                        i++;
-                        continue;
-                    }
-                }
-
-                if (t.type === 'keyword') {
-                    if (t.value === 'local' || t.value === 'function') {
-                        // Pula linhas de função/var (o VM simplificado não as executa, mas elas ficam no bytecode)
-                        while (i < tokens.length && tokens[i].value !== 'end') i++;
-                        i++;
-                        continue;
-                    }
-                    if (t.value === 'return') {
-                        bytecode.push(OPCODES.RETURN);
-                        i++;
-                        continue;
-                    }
-                }
-
+            // Atribuição
+            if (i+1 < tokens.length && tokens[i+1].value === '=') {
+                bytecode.push(OPCODES.SETGLOBAL, addConstant(t.value));
+                i += 2;
+                if (tokens[i] && tokens[i].type === 'string') bytecode.push(OPCODES.LOADK, addConstant(tokens[i].value));
+                else if (tokens[i] && tokens[i].type === 'number') bytecode.push(OPCODES.LOADK, tokens[i].value);
+                else if (tokens[i] && tokens[i].type === 'identifier') bytecode.push(OPCODES.GETGLOBAL, addConstant(tokens[i].value));
                 i++;
-            }
-
-            // Se não gerou bytecode (script vazio ou só comentários), gera um NOP
-            if (bytecode.length === 0) {
-                bytecode.push(OPCODES.RETURN);
-            }
-
-            return {
-                bytecode: bytecode,
-                constants: constantTable
-            };
-        }
-
-        // ============================================================
-        // 2. GERADOR DO SCRIPT LUA DA VM
-        // ============================================================
-        function gerarScriptVM(compiled) {
-            const bcStr = compiled.bytecode.join(',');
-            const constStr = JSON.stringify(compiled.constants); // Stringify para representar a tabela de constantes
-            
-            // Gera nomes de variáveis aleatórios para dificultar
-            const v = (n) => `_${n}_${Math.random().toString(36).substring(2, 8)}`;
-            const v_pc = v('pc');
-            const v_bc = v('bc');
-            const v_const = v('const');
-            const v_stack = v('stack');
-            const v_i = v('i');
-            const v_op = v('op');
-            const v_arg1 = v('arg1');
-            const v_arg2 = v('arg2');
-
-            // O script Lua que executa o bytecode
-            // Ele tem a lógica de cada opcode
-            return `-- [[ Power X VM v5 (Offline) ]]\n` +
-            `local ${v_bc} = {${bcStr}}\n` +
-            `local ${v_const} = {${constStr}}\n` +
-            `local ${v_stack} = {}\n` +
-            `local ${v_pc} = 1\n` +
-            `while ${v_pc} <= #${v_bc} do\n` +
-            `    local ${v_op} = ${v_bc}[${v_pc}]\n` +
-            `    if ${v_op} == 1 then -- LOADK\n` +
-            `        ${v_pc} = ${v_pc} + 1\n` +
-            `        table.insert(${v_stack}, ${v_const}[${v_bc}[${v_pc}]])\n` +
-            `    elseif ${v_op} == 2 then -- GETGLOBAL\n` +
-            `        ${v_pc} = ${v_pc} + 1\n` +
-            `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
-            `        table.insert(${v_stack}, _G[name] or game[name] or workspace[name] or getfenv()[name])\n` +
-            `    elseif ${v_op} == 4 then -- SETGLOBAL\n` +
-            `        ${v_pc} = ${v_pc} + 1\n` +
-            `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
-            `        local val = table.remove(${v_stack})\n` +
-            `        _G[name] = val\n` +
-            `    elseif ${v_op} == 5 then -- CALL\n` +
-            `        ${v_pc} = ${v_pc} + 1\n` +
-            `        local nargs = ${v_bc}[${v_pc}]\n` +
-            `        local args = {}\n` +
-            `        for i = 1, nargs do table.insert(args, 1, table.remove(${v_stack})) end\n` +
-            `        local func = table.remove(${v_stack})\n` +
-            `        local ok, res = pcall(func, table.unpack(args))\n` +
-            `        table.insert(${v_stack}, res)\n` +
-            `    elseif ${v_op} == 6 then -- RETURN\n` +
-            `        break\n` +
-            `    end\n` +
-            `    ${v_pc} = ${v_pc} + 1\n` +
-            `end\n`;
-        }
-
-        // ============================================================
-        // 3. FUNÇÃO PRINCIPAL DE OFUSCAÇÃO
-        // ============================================================
-        function ofuscarVM(codigo) {
-            if (!codigo.trim()) throw new Error("Código vazio.");
-            
-            try {
-                // 1. Compila para bytecode
-                const compiled = compileToBytecode(codigo);
-                // 2. Gera o script Lua da VM
-                const scriptFinal = gerarScriptVM(compiled);
-                // 3. Adiciona uma camada extra de "sujeira" (espaços, comentários falsos)
-                return scriptFinal;
-            } catch (e) {
-                console.warn("Compilação falhou, usando fallback de string:", e);
-                // Fallback: se o parser falhar, usa a ofuscação simples de XOR
-                return ofuscarSimples(codigo);
+                continue;
             }
         }
+        i++;
+    }
+    if (bytecode.length === 0) bytecode.push(OPCODES.RETURN);
+    return { bytecode: bytecode, constants: constantTable };
+}
 
-        function ofuscarSimples(code) {
-            const utf8 = unescape(encodeURIComponent(code));
-            const bytecode = [];
-            const primaryKey = Math.floor(Math.random() * 100) + 100;
-            const secondaryKey = Math.floor(Math.random() * 50) + 20;
-            for (let i = 0; i < utf8.length; i++) {
-                const b = utf8.charCodeAt(i);
-                const step1 = b ^ primaryKey;
-                const step2 = (step1 + secondaryKey) % 256;
-                bytecode.push(step2);
-            }
-            const vBytecode = "_" + Math.random().toString(36).substring(2, 15);
-            const vStack = "_" + Math.random().toString(36).substring(2, 15);
-            return `-- [[ Power X VM v5 (Fallback) ]]\n` +
-                `local ${vBytecode} = {${bytecode.join(',')}}\n` +
-                `local ${vStack} = {}\n` +
-                `local function _dec(val) return string.char(bit32.bxor((val - ${secondaryKey}) % 256, ${primaryKey})) end\n` +
-                `for i = 1, #${vBytecode} do table.insert(${vStack}, _dec(${vBytecode}[i])) end\n` +
-                `local fn, err = loadstring(table.concat(${vStack}), "PowerX_VM")\n` +
-                `if fn then fn() else error(err) end`;
+// ============================================================
+// 2. CIFRA POLIMORFICA (O Segredo do Fortress)
+// ============================================================
+// Transforma o bytecode num array de números usando uma função matemática.
+// A chave não é um número fixo, é o resultado de um polinômio.
+function cifrarFortress(bytecodeArray) {
+    // Escolhe uma chave base aleatória
+    const keyBase = Math.floor(Math.random() * 200) + 50;
+    const shift = Math.floor(Math.random() * 50) + 10;
+    
+    const encrypted = bytecodeArray.map((val, index) => {
+        // A chave muda a cada posição: (keyBase * index^2) + shift
+        const dynamicKey = (keyBase * Math.pow(index % 10, 2)) + shift;
+        // Cifra: (valor XOR chave) + chave
+        return ((val ^ dynamicKey) + dynamicKey) % 256;
+    });
+    
+    return {
+        data: encrypted,
+        // A "chave" que vai pro script é apenas os parâmetros iniciais da função
+        key1: keyBase,
+        key2: shift
+    };
+}
+
+// ============================================================
+// 3. GERADOR DO SCRIPT FINAL (A Fortaleza)
+// ============================================================
+function gerarScriptFortress(compiled) {
+    // Cifra o bytecode
+    const encryptedBC = cifrarFortress(compiled.bytecode);
+    
+    // Cifra a tabela de constantes (strings) com Base64
+    const b64Constants = btoa(unescape(encodeURIComponent(JSON.stringify(compiled.constants))));
+
+    // Nomes de variáveis totalmente aleatórios (polimorfismo)
+    const v = (n) => `_${Math.random().toString(36).substring(2, 10)}${n}`;
+    const v_enc = v('enc'), v_k1 = v('k1'), v_k2 = v('k2'), v_bc = v('bc');
+    const v_const = v('const'), v_stack = v('stack'), v_pc = v('pc');
+    const v_op = v('op'), v_i = v('i'), v_key = v('key'), v_arg = v('arg');
+    const v_func = v('func'), v_args = v('args');
+
+    // Código Lua da VM, agora com a camada de decifração
+    return `-- [[ Power X Fortress ]]\n` +
+    `local ${v_enc} = {${encryptedBC.data.join(',')}}\n` +
+    `local ${v_k1} = ${encryptedBC.key1}\n` +
+    `local ${v_k2} = ${encryptedBC.key2}\n` +
+    `local ${v_const} = {${compiled.constants.map(c => typeof c === 'string' ? `"${c}"` : c).join(',')}}\n` +
+    `local ${v_bc} = {}\n` +
+    `-- Camada 1: Decifrar o Bytecode\n` +
+    `for ${v_i} = 1, #${v_enc} do\n` +
+    `    local ${v_key} = (${v_k1} * math.pow((${v_i} - 1) % 10, 2)) + ${v_k2}\n` +
+    `    local val = (${v_enc}[${v_i}] - ${v_key}) % 256\n` +
+    `    table.insert(${v_bc}, bit32.bxor(val, ${v_key}))\n` +
+    `end\n` +
+    `-- Camada 2: Executar a VM\n` +
+    `local ${v_stack} = {}\n` +
+    `local ${v_pc} = 1\n` +
+    `while ${v_pc} <= #${v_bc} do\n` +
+    `    local ${v_op} = ${v_bc}[${v_pc}]\n` +
+    `    if ${v_op} == 1 then -- LOADK\n` +
+    `        ${v_pc} = ${v_pc} + 1\n` +
+    `        table.insert(${v_stack}, ${v_const}[${v_bc}[${v_pc}]])\n` +
+    `    elseif ${v_op} == 2 then -- GETGLOBAL\n` +
+    `        ${v_pc} = ${v_pc} + 1\n` +
+    `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
+    `        table.insert(${v_stack}, _G[name] or game[name] or workspace[name] or getfenv()[name])\n` +
+    `    elseif ${v_op} == 3 then -- SETGLOBAL\n` +
+    `        ${v_pc} = ${v_pc} + 1\n` +
+    `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
+    `        local val = table.remove(${v_stack})\n` +
+    `        _G[name] = val\n` +
+    `    elseif ${v_op} == 4 then -- CALL\n` +
+    `        ${v_pc} = ${v_pc} + 1\n` +
+    `        local nargs = ${v_bc}[${v_pc}]\n` +
+    `        local args = {}\n` +
+    `        for i = 1, nargs do table.insert(args, 1, table.remove(${v_stack})) end\n` +
+    `        local func = table.remove(${v_stack})\n` +
+    `        local ok, res = pcall(func, table.unpack(args))\n` +
+    `        table.insert(${v_stack}, res)\n` +
+    `    elseif ${v_op} == 5 then -- RETURN\n` +
+    `        break\n` +
+    `    end\n` +
+    `    ${v_pc} = ${v_pc} + 1\n` +
+    `end\n`;
+}
+
+// ============================================================
+// 4. SITE LÓGICA
+// ============================================================
+async function publicarHastebin(conteudo) {
+    const resp = await fetch('https://keybin.io/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: conteudo })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (!data.key) throw new Error('Resposta sem chave.');
+    return `https://keybin.io/raw/${data.key}`;
+}
+
+const alertDiv = document.getElementById('alert');
+const alertIcon = document.getElementById('alertIcon');
+const alertMsg = document.getElementById('alertMsg');
+const srcCode = document.getElementById('srcCode');
+const ofuscadoArea = document.getElementById('ofuscado');
+const outCode = document.getElementById('outCode');
+const rawLink = document.getElementById('rawLink');
+const charCount = document.getElementById('charCount');
+
+srcCode.addEventListener('input', () => { charCount.textContent = srcCode.value.length; });
+
+function mostrarAlerta(msg, tipo = 'info', tempo = 6000) {
+    alertDiv.className = 'alert show';
+    alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
+    alertMsg.textContent = msg;
+    if (tipo === 'error') alertDiv.classList.add('error');
+    else alertDiv.classList.remove('error');
+    clearTimeout(window._alertTimer);
+    if (tempo > 0) window._alertTimer = setTimeout(() => { alertDiv.className = 'alert'; }, tempo);
+}
+
+async function compilarEPublicar() {
+    const codigo = srcCode.value;
+    if (!codigo.trim()) { mostrarAlerta('Cole um script.', 'error'); return; }
+    try {
+        const compiled = compileToBytecode(codigo);
+        const scriptFinal = gerarScriptFortress(compiled);
+        ofuscadoArea.value = scriptFinal;
+        
+        try {
+            const link = await publicarHastebin(scriptFinal);
+            rawLink.value = link;
+            outCode.value = `loadstring(game:HttpGet("${link}"))()`;
+            mostrarAlerta('✅ Fortress compilado e publicado!', 'info', 5000);
+        } catch (e) {
+            mostrarAlerta('⚠️ Publicação falhou. Use o modo manual.', 'error', 8000);
         }
+    } catch (e) {
+        mostrarAlerta(`Erro na compilação: ${e.message}`, 'error');
+    }
+}
 
-        // ============================================================
-        // 4. LÓGICA DO SITE
-        // ============================================================
-        async function publicarHastebin(conteudo) {
-            const resp = await fetch('https://keybin.io/api/documents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: conteudo })
-            });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const data = await resp.json();
-            if (!data.key) throw new Error('Resposta sem chave.');
-            return `https://keybin.io/raw/${data.key}`;
-        }
+function gerarLoadstringManual() {
+    const link = rawLink.value.trim();
+    if (!link) { mostrarAlerta('Cole um link raw.', 'error'); return; }
+    outCode.value = `loadstring(game:HttpGet("${link}"))()`;
+    mostrarAlerta('✅ Loadstring gerado!', 'info', 3000);
+}
 
-        const alertDiv = document.getElementById('alert');
-        const alertIcon = document.getElementById('alertIcon');
-        const alertMsg = document.getElementById('alertMsg');
-        const srcCode = document.getElementById('srcCode');
-        const ofuscadoArea = document.getElementById('ofuscado');
-        const outCode = document.getElementById('outCode');
-        const rawLink = document.getElementById('rawLink');
-        const charCount = document.getElementById('charCount');
-        const btnPublish = document.getElementById('btnPublish');
+function copiarResultado() {
+    if (!outCode.value) return;
+    navigator.clipboard.writeText(outCode.value).then(() => mostrarAlerta('📋 Copiado!', 'info', 2000));
+}
 
-        srcCode.addEventListener('input', () => { charCount.textContent = srcCode.value.length; });
+function copiarLink() {
+    if (!rawLink.value) return;
+    navigator.clipboard.writeText(rawLink.value).then(() => mostrarAlerta('🔗 Copiado!', 'info', 2000));
+}
 
-        function mostrarAlerta(msg, tipo = 'info', tempo = 6000) {
-            alertDiv.className = 'alert show';
-            alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
-            alertMsg.textContent = msg;
-            if (tipo === 'error') alertDiv.classList.add('error');
-            else alertDiv.classList.remove('error');
-            clearTimeout(window._alertTimer);
-            if (tempo > 0) window._alertTimer = setTimeout(() => { alertDiv.className = 'alert'; }, tempo);
-        }
-
-        function esconderAlerta() { alertDiv.className = 'alert'; }
-
-        function setLoading(loading) {
-            if (loading) {
-                btnPublish.disabled = true;
-                btnPublish.innerHTML = `<span class="spinner" style="display:inline-block;"></span> Processando...`;
-                mostrarAlerta('Compilando bytecode...', 'info', 0);
-            } else {
-                btnPublish.disabled = false;
-                btnPublish.innerHTML = `<span>🚀</span> Compilar &amp; Publicar`;
-                esconderAlerta();
-            }
-        }
-
-        async function compilarEPublicar() {
-            const codigo = srcCode.value;
-            if (!codigo.trim()) {
-                mostrarAlerta('Por favor, cole um script.', 'error');
-                return;
-            }
-
-            try {
-                setLoading(true);
-                
-                // 1. Ofusca
-                const ofuscado = ofuscarVM(codigo);
-                ofuscadoArea.value = ofuscado;
-                
-                // 2. Tenta publicar
-                let linkRaw = null;
-                try {
-                    linkRaw = await publicarHastebin(ofuscado);
-                    rawLink.value = linkRaw;
-                    outCode.value = `-- [[ Power X Loadstring ]]\nloadstring(game:HttpGet("${linkRaw}"))()`;
-                    mostrarAlerta('✅ Compilado e publicado!', 'info', 5000);
-                } catch (err) {
-                    console.warn(err);
-                    mostrarAlerta('⚠️ Falha na publicação automática. Use o modo manual.', 'error', 8000);
-                }
-
-            } catch (err) {
-                mostrarAlerta(`Erro: ${err.message}`, 'error');
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        function gerarLoadstringManual() {
-            const link = rawLink.value.trim();
-            if (!link) { mostrarAlerta('Cole um link raw válido.', 'error'); return; }
-            if (!link.startsWith('http')) { mostrarAlerta('Link deve começar com http(s)://', 'error'); return; }
-            outCode.value = `-- [[ Power X Loadstring ]]\nloadstring(game:HttpGet("${link}"))()`;
-            mostrarAlerta('✅ Loadstring gerado!', 'info', 4000);
-        }
-
-        function copiarResultado() {
-            if (!outCode.value) { mostrarAlerta('Nada para copiar.', 'error'); return; }
-            navigator.clipboard.writeText(outCode.value).then(() => {
-                mostrarAlerta('📋 Loadstring copiado!', 'info', 3000);
-            });
-        }
-
-        function copiarLink() {
-            if (!rawLink.value) { mostrarAlerta('Nenhum link para copiar.', 'error'); return; }
-            navigator.clipboard.writeText(rawLink.value).then(() => {
-                mostrarAlerta('🔗 Link copiado!', 'info', 3000);
-            });
-        }
-
-        // Script de exemplo
-        srcCode.value = `-- Exemplo: Fly simples\nlocal player = game.Players.LocalPlayer\nlocal char = player.Character or player.CharacterAdded:Wait()\nlocal root = char:WaitForChild("HumanoidRootPart")\nlocal bv = Instance.new("BodyVelocity")\nbv.MaxForce = Vector3.new(1e6,1e6,1e6)\nbv.Parent = root\ngame:GetService("RunService").Heartbeat:Connect(function()\n    bv.Velocity = Vector3.new(0,10,0)\nend)`;
-        charCount.textContent = srcCode.value.length;
-    </script>
+// Exemplo inicial
+srcCode.value = `local player = game.Players.LocalPlayer\nlocal char = player.Character or player.CharacterAdded:Wait()\nprint("Power X Fortress Ativado")`;
+charCount.textContent = srcCode.value.length;
+</script>
 </body>
 </html>
