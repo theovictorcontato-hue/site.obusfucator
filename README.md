@@ -1,4 +1,4 @@
-# ⚡ Power X Hub - VM Obfuscator v5
+# ⚡ Power X Hub - VM Obfuscator v1
 
 Um obfuscador de código Luau com VM integrada para ofuscar e publicar scripts automaticamente.
 
@@ -6,8 +6,6 @@ Um obfuscador de código Luau com VM integrada para ofuscar e publicar scripts a
 
 ### Funcionalidades:
 - 🔐 Ofuscação de código com VM bytecode
-- 🚀 Publicação automática via Keybin
-- 🔗 Geração de loadstrings
 - 📋 Copiar código ofuscado
 - ⚡ Interface moderna e responsiva
 
