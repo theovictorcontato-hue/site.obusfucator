@@ -1,495 +1,471 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚡ Power X Hub · VM Obfuscator v5</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #090b11; color: #e2e8f0;
-            min-height: 100vh; display: flex;
-            justify-content: center; align-items: center; padding: 20px;
-        }
-        .container { width: 100%; max-width: 960px; margin: 0 auto; }
-        .card {
-            background: linear-gradient(145deg, #141823, #0d1019);
-            border-radius: 28px; padding: 38px 34px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
-            transition: box-shadow 0.3s;
-        }
-        .card:hover {
-            box-shadow: 0 35px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,255,183,0.15);
-        }
-        .header {
-            display: flex; align-items: center; gap: 14px;
-            margin-bottom: 28px; padding-bottom: 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .header .icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(0,255,183,0.25)); }
-        .header h1 {
-            font-size: 27px; font-weight: 700;
-            background: linear-gradient(135deg, #00ffb7, #00b894);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: -0.3px;
-        }
-        .header .tag {
-            margin-left: auto; background: rgba(0,255,183,0.08);
-            color: #00ffb7; font-size: 11px; font-weight: 600;
-            padding: 5px 16px; border-radius: 30px;
-            border: 1px solid rgba(0,255,183,0.15);
-            text-transform: uppercase; letter-spacing: 0.8px;
-        }
-        .alert {
-            padding: 14px 20px; border-radius: 16px;
-            background: rgba(0,255,183,0.05);
-            border: 1px solid rgba(0,255,183,0.15);
-            color: #00ffb7; font-size: 14px; font-weight: 500;
-            display: none; align-items: center; gap: 12px;
-            margin-bottom: 24px; animation: fadeSlide 0.3s ease;
-        }
-        .alert.show { display: flex; }
-        .alert.error {
-            background: rgba(255,71,87,0.07);
-            border-color: rgba(255,71,87,0.2); color: #ff6b7a;
-        }
-        .alert .spinner {
-            width: 20px; height: 20px;
-            border: 2.5px solid rgba(0,255,183,0.15);
-            border-top-color: #00ffb7; border-radius: 50%;
-            animation: spin 0.8s linear infinite; flex-shrink: 0;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeSlide {
-            0% { opacity: 0; transform: translateY(-8px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .field { margin-bottom: 22px; }
-        .field label {
-            display: block; font-size: 14px; font-weight: 600;
-            color: #b6c2d4; margin-bottom: 8px; letter-spacing: 0.2px;
-        }
-        .field label .emoji { margin-right: 8px; }
-        textarea, input[type="text"] {
-            width: 100%; padding: 14px 18px;
-            background: #0b0e16; border: 1px solid #232d3e;
-            border-radius: 14px; color: #dce4f0;
-            font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
-            font-size: 14px; line-height: 1.6;
-            transition: border-color 0.25s, box-shadow 0.25s;
-            resize: vertical;
-        }
-        textarea:focus, input[type="text"]:focus {
-            outline: none; border-color: #00ffb7;
-            box-shadow: 0 0 0 3px rgba(0,255,183,0.06);
-        }
-        textarea::placeholder, input::placeholder { color: #3d4a5e; }
-        textarea { min-height: 140px; }
-        textarea[readonly], input[readonly] {
-            background: #080b12; color: #8b9bb0;
-        }
-        .char-counter {
-            text-align: right; font-size: 12px;
-            color: #4a5a6e; margin-top: 5px; padding-right: 4px;
-        }
-        .inline-link {
-            display: flex; gap: 12px; align-items: center;
-            background: #0b0e16; padding: 6px 14px 6px 18px;
-            border-radius: 14px; border: 1px solid #1e2a3a;
-            margin-top: 6px;
-        }
-        .inline-link input {
-            flex: 1; border: none; background: transparent;
-            padding: 10px 0; color: #00ffb7;
-            font-size: 14px; font-family: monospace;
-        }
-        .inline-link input:focus { box-shadow: none; }
-        .inline-link .copy-mini {
-            background: #1e293b; border: none; color: #cbd5e1;
-            padding: 8px 18px; border-radius: 10px; cursor: pointer;
-            font-weight: 600; font-size: 13px; transition: 0.15s;
-        }
-        .inline-link .copy-mini:hover { background: #2d3a4f; color: #fff; }
-        .actions {
-            display: flex; flex-wrap: wrap; gap: 12px;
-            margin: 26px 0 24px;
-        }
-        .btn {
-            flex: 1 1 160px; padding: 15px 22px; border: none;
-            border-radius: 14px; font-weight: 700; font-size: 15px;
-            cursor: pointer; display: inline-flex; align-items: center;
-            justify-content: center; gap: 10px;
-            transition: all 0.2s ease; background: #1f2937;
-            color: #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
-        .btn:active { transform: translateY(0px); }
-        .btn-primary {
-            background: linear-gradient(135deg, #00ffb7, #00b380);
-            color: #0a0c12;
-        }
-        .btn-primary:hover { box-shadow: 0 8px 30px rgba(0,255,183,0.3); }
-        .btn-secondary {
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: #fff;
-        }
-        .btn-secondary:hover { box-shadow: 0 8px 30px rgba(168,85,247,0.3); }
-        .btn-outline {
-            background: transparent; border: 1px solid #334155; color: #cbd5e1;
-        }
-        .btn-outline:hover { background: #1e293b; border-color: #00ffb7; }
-        .btn:disabled { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
-        .footer {
-            margin-top: 30px; text-align: center; font-size: 13px;
-            color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04);
-            padding-top: 24px;
-        }
-        .footer a { color: #00ffb7; text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
-        @media (max-width: 650px) {
-            .card { padding: 24px 16px; }
-            .header h1 { font-size: 20px; }
-            .btn { flex: 1 1 100%; }
-            .header .tag { display: none; }
-            .inline-link { flex-wrap: wrap; }
-            .inline-link input { width: 100%; }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>⚡ Power X Hub · Obfuscator v1</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #090b11; color: #e2e8f0;
+    min-height: 100vh; display: flex; justify-content: center;
+    align-items: center; padding: 20px;
+}
+.container { width: 100%; max-width: 980px; }
+.card {
+    background: linear-gradient(145deg, #141823, #0d1019);
+    border-radius: 28px; padding: 34px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
+}
+.header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 24px; padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.header .icon { font-size: 34px; }
+.header h1 {
+    font-size: 25px; font-weight: 700;
+    background: linear-gradient(135deg, #00ffb7, #00b894);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header .tag {
+    margin-left: auto; background: rgba(0,255,183,0.08);
+    color: #00ffb7; font-size: 11px; font-weight: 600;
+    padding: 5px 14px; border-radius: 30px;
+    border: 1px solid rgba(0,255,183,0.15);
+    text-transform: uppercase; letter-spacing: 0.8px;
+}
+.alert {
+    padding: 12px 18px; border-radius: 14px;
+    background: rgba(0,255,183,0.05);
+    border: 1px solid rgba(0,255,183,0.15);
+    color: #00ffb7; font-size: 13px; font-weight: 500;
+    display: none; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+}
+.alert.show { display: flex; }
+.alert.error {
+    background: rgba(255,71,87,0.07);
+    border-color: rgba(255,71,87,0.2); color: #ff6b7a;
+}
+.field { margin-bottom: 20px; }
+.field label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: #b6c2d4; margin-bottom: 7px;
+}
+.field label .emoji { margin-right: 6px; }
+textarea {
+    width: 100%; padding: 13px 16px;
+    background: #0b0e16; border: 1px solid #232d3e;
+    border-radius: 12px; color: #dce4f0;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px; line-height: 1.5; resize: vertical;
+}
+textarea:focus { outline: none; border-color: #00ffb7; }
+textarea[readonly] { background: #080b12; color: #8b9bb0; }
+.char-counter { text-align: right; font-size: 11px; color: #4a5a6e; margin-top: 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 20px; }
+.btn {
+    flex: 1 1 150px; padding: 14px 20px; border: none;
+    border-radius: 12px; font-weight: 700; font-size: 14px;
+    cursor: pointer; display: inline-flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: all 0.2s ease; background: #1f2937; color: #e2e8f0;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.btn-primary { background: linear-gradient(135deg, #00ffb7, #00b380); color: #0a0c12; }
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(0,255,183,0.3); }
+.btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
+.btn-outline:hover { background: #1e293b; border-color: #00ffb7; }
+.footer {
+    margin-top: 24px; text-align: center; font-size: 12px;
+    color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 20px;
+}
+@media (max-width: 650px) {
+    .card { padding: 22px 14px; }
+    .header h1 { font-size: 19px; }
+    .btn { flex: 1 1 100%; }
+    .header .tag { display: none; }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <span class="icon">⚡</span>
-                <h1>Power X Hub</h1>
-                <span class="tag">VM Obfuscator v5</span>
-            </div>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <span class="icon">⚡</span>
+            <h1>Power X Hub</h1>
+            <span class="tag">Obfuscator v1</span>
+        </div>
 
-            <div id="alert" class="alert">
-                <span id="alertIcon">✅</span>
-                <span id="alertMsg">Pronto!</span>
-            </div>
+        <div id="alert" class="alert">
+            <span id="alertIcon">✅</span>
+            <span id="alertMsg">Pronto!</span>
+        </div>
 
-            <div class="field">
-                <label><span class="emoji">📄</span> Código Original Luau</label>
-                <textarea id="srcCode" placeholder="-- Cole seu script aqui..." rows="6"></textarea>
-                <div class="char-counter"><span id="charCount">0</span> caracteres</div>
-            </div>
+        <div class="field">
+            <label><span class="emoji">📄</span> Código Original Luau</label>
+            <textarea id="srcCode" rows="8" placeholder="-- Cole seu script aqui..."></textarea>
+            <div class="char-counter"><span id="charCount">0</span> caracteres</div>
+        </div>
 
-            <div class="actions">
-                <button class="btn btn-primary" id="btnPublish" onclick="compilarEPublicar()">
-                    <span>🚀</span> Compilar &amp; Publicar
-                </button>
-                <button class="btn btn-secondary" onclick="gerarLoadstringManual()">
-                    <span>🔗</span> Gerar Loadstring (Manual)
-                </button>
-                <button class="btn btn-outline" onclick="copiarResultado()">
-                    <span>📋</span> Copiar Loadstring
-                </button>
-            </div>
+        <div class="actions">
+            <button class="btn btn-primary" onclick="compilar()">
+                <span>🚀</span> Ofuscar
+            </button>
+            <button class="btn btn-outline" onclick="copiarOfuscado()">
+                <span>📋</span> Copiar Código
+            </button>
+            <button class="btn btn-outline" onclick="limpar()">
+                <span>🧹</span> Limpar
+            </button>
+        </div>
 
-            <div class="field">
-                <label><span class="emoji">🔗</span> Link Raw (pode colar manualmente)</label>
-                <div class="inline-link">
-                    <input type="text" id="rawLink" placeholder="https://pastebin.com/raw/..." />
-                    <button class="copy-mini" onclick="copiarLink()">Copiar</button>
-                </div>
-                <div style="font-size:12px; color:#4a5a6e; margin-top:6px;">
-                    Se a publicação automática falhar, copie o código ofuscado (abaixo) e cole no Pastebin,
-                    depois cole o link raw aqui e clique em "Gerar Loadstring (Manual)".
-                </div>
-            </div>
+        <div class="field">
+            <label><span class="emoji">🔐</span> Código Ofuscado (Luau válido — roda direto)</label>
+            <textarea id="outCode" rows="14" readonly placeholder="O código ofuscado aparecerá aqui..."></textarea>
+            <div class="char-counter"><span id="outCount">0</span> caracteres</div>
+        </div>
 
-            <div class="field">
-                <label><span class="emoji">🔐</span> Código Ofuscado (para fallback)</label>
-                <textarea id="ofuscado" readonly placeholder="O código ofuscado aparecerá aqui..." rows="4"></textarea>
-            </div>
-
-            <div class="field" style="margin-bottom:0;">
-                <label><span class="emoji">📦</span> Script Final (com loadstring)</label>
-                <textarea id="outCode" readonly placeholder="O loadstring final será gerado aqui..." rows="3"></textarea>
-            </div>
-
-            <div class="footer">
-                🔒 Ofuscação 100% local (sem API externa).<br />
-                Requer <code>LoadStringEnabled</code> ativado no Roblox Studio para funcionar.
-            </div>
+        <div class="footer">
+            🔒 Ofuscação 100% local · Sem <code>loadstring</code> · Luau válido direto
         </div>
     </div>
+</div>
 
-    <script>
-        // ============================================================
-        // OFUSCADOR - Power X VM v5 (compatível com Roblox Luau)
-        // Usa bit32 em vez de operadores bitwise (~, &, >>, <<)
-        // ============================================================
+<script>
+// ============================================================
+// RNG xorshift32
+// ============================================================
+function makeRNG(seed) {
+    let s = seed >>> 0;
+    if (s === 0) s = 1;
+    return function () {
+        s ^= s << 13; s >>>= 0;
+        s ^= s >>> 17;
+        s ^= s << 5;  s >>>= 0;
+        return s;
+    };
+}
 
-        function makeLCG(seed) {
-            let s = seed >>> 0;
-            return function () {
-                s = (s * 1664525 + 1013904223) >>> 0;
-                return s;
-            };
+// Gerador de nomes únicos
+function makeNameGen(seed) {
+    const rng = makeRNG(seed);
+    const used = new Set();
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    return function () {
+        let name, tries = 0;
+        do {
+            name = "_";
+            const len = 6 + (rng() % 6);
+            for (let i = 0; i < len; i++) name += chars[rng() % chars.length];
+            tries++;
+        } while (used.has(name) && tries < 100);
+        if (used.has(name)) name = name + "_" + (used.size);
+        used.add(name);
+        return name;
+    };
+}
+
+// Escape de string Lua
+function luaStr(s) {
+    return '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+}
+
+// ============================================================
+// Tokenizer simples de Luau (para string / número / ident / op)
+// ============================================================
+function tokenize(code) {
+    const tokens = [];
+    let i = 0;
+    const n = code.length;
+    const isIdStart = c => /[A-Za-z_]/.test(c);
+    const isId = c => /[A-Za-z0-9_]/.test(c);
+    const isDigit = c => /[0-9]/.test(c);
+
+    while (i < n) {
+        const c = code[i];
+
+        // whitespace
+        if (/\s/.test(c)) {
+            let j = i;
+            while (j < n && /\s/.test(code[j])) j++;
+            tokens.push({ t: 'ws', v: code.slice(i, j) });
+            i = j;
+            continue;
         }
 
-        function randomName(lcg) {
-            const chars = "Il1O0o_$";
-            let n = "_";
-            const len = 8 + (lcg() % 8);
-            for (let i = 0; i < len; i++) {
-                n += chars[lcg() % chars.length];
-            }
-            return n;
+        // comentário de linha
+        if (c === '-' && code[i + 1] === '-') {
+            let j = i;
+            while (j < n && code[j] !== '\n') j++;
+            tokens.push({ t: 'comment', v: code.slice(i, j) });
+            i = j;
+            continue;
         }
 
-        function numExpr(n, lcg) {
-            if (n === 0) return "0";
-            const a = (lcg() % 200) + 1;
-            const b = a + n;
-            return `(${b}-${a})`;
-        }
-
-        function ofuscar(code) {
-            if (!code.trim()) throw new Error("Código fonte vazio.");
-
-            // 1. Remove comentários de linha (fora de strings)
-            let limpo = "";
-            let inStr = false, strChar = "", i = 0;
-            while (i < code.length) {
-                const c = code[i];
-                if (inStr) {
-                    limpo += c;
-                    if (c === "\\") { limpo += code[i + 1] || ""; i += 2; continue; }
-                    if (c === strChar) inStr = false;
-                    i++;
+        // string
+        if (c === '"' || c === "'") {
+            const q = c;
+            let j = i + 1, val = "";
+            while (j < n) {
+                if (code[j] === '\\') {
+                    val += code[j] + (code[j + 1] || '');
+                    j += 2;
                     continue;
                 }
-                if (c === '"' || c === "'") { inStr = true; strChar = c; limpo += c; i++; continue; }
-                if (c === "-" && code[i + 1] === "-") {
-                    while (i < code.length && code[i] !== "\n") i++;
-                    continue;
-                }
-                limpo += c;
-                i++;
+                if (code[j] === q) { j++; break; }
+                val += code[j];
+                j++;
             }
-
-            // 2. UTF-8 bytes (TextEncoder é padrão em navegadores modernos)
-            const encoder = new TextEncoder();
-            const bytes = Array.from(encoder.encode(limpo));
-
-            // 3. Chaves derivadas do conteúdo
-            const seed = bytes.reduce((a, b) => (a * 31 + b) >>> 0, 7);
-            const lcg = makeLCG(seed);
-
-            const nBlocks = 3 + (lcg() % 3);
-            const blockSize = Math.ceil(bytes.length / nBlocks);
-
-            // 4. Criptografia por bloco: XOR + rotação + soma
-            const blocks = [];
-            const keys = [];
-            for (let b = 0; b < nBlocks; b++) {
-                const k1 = (lcg() % 255) + 1;
-                const k2 = (lcg() % 255) + 1;
-                const k3 = (lcg() % 7) + 1;
-                keys.push([k1, k2, k3]);
-
-                const start = b * blockSize;
-                const end = Math.min(start + blockSize, bytes.length);
-                const out = [];
-                for (let j = start; j < end; j++) {
-                    let v = bytes[j];
-                    v = v ^ k1;
-                    v = ((v << k3) | (v >>> (8 - k3))) & 0xFF;
-                    v = (v + k2) & 0xFF;
-                    out.push(v);
-                }
-                blocks.push(out);
-            }
-
-            // 5. Checksum FNV-like dos bytes originais
-            let checksum = 0;
-            for (let j = 0; j < bytes.length; j++) {
-                checksum = (Math.imul(checksum, 131) + bytes[j]) >>> 0;
-            }
-
-            // 6. Nomes de variáveis
-            const vBlocks = randomName(lcg);
-            const vKeys   = randomName(lcg);
-            const vBuf    = randomName(lcg);
-            const vSum    = randomName(lcg);
-            const vIdx    = randomName(lcg);
-            const vBlk    = randomName(lcg);
-            const vByte   = randomName(lcg);
-            const vRot    = randomName(lcg);
-            const vDec    = randomName(lcg);
-            const vOut    = randomName(lcg);
-            const vRun    = randomName(lcg);
-            const vErr    = randomName(lcg);
-
-            // 7. Gera script com bit32 (compatível com Roblox)
-            const L = [];
-            L.push(`-- [[ Power X VM v5 (bit32 safe) ]]`);
-            L.push(`local ${vBlocks} = {`);
-            for (let b = 0; b < blocks.length; b++) {
-                L.push(`  {${blocks[b].join(",")}},`);
-            }
-            L.push(`}`);
-            L.push(`local ${vKeys} = {`);
-            for (let b = 0; b < keys.length; b++) {
-                L.push(`  {${keys[b].join(",")}},`);
-            }
-            L.push(`}`);
-            L.push(`local ${vBuf} = {}`);
-            L.push(`local ${vSum} = 0`);
-            L.push(`for ${vBlk} = 1, #${vBlocks} do`);
-            L.push(`  local ${vDec} = ${vKeys}[${vBlk}]`);
-            L.push(`  ${vRot} = ${vDec}[3]`);
-            L.push(`  for ${vIdx} = 1, #${vBlocks}[${vBlk}] do`);
-            L.push(`    ${vByte} = ${vBlocks}[${vBlk}][${vIdx}]`);
-            L.push(`    ${vByte} = bit32.band(${vByte} - ${vDec}[2], 255)`);
-            L.push(`    ${vByte} = bit32.band(bit32.bor(bit32.rshift(${vByte}, ${vRot}), bit32.lshift(${vByte}, 8 - ${vRot})), 255)`);
-            L.push(`    ${vByte} = bit32.bxor(${vByte}, ${vDec}[1])`);
-            L.push(`    ${vBuf}[#${vBuf} + 1] = string.char(${vByte})`);
-            L.push(`  end`);
-            L.push(`end`);
-            L.push(`local ${vOut} = table.concat(${vBuf})`);
-            L.push(`for ${vIdx} = 1, #${vOut} do`);
-            L.push(`  ${vSum} = bit32.band(${vSum} * 131 + string.byte(${vOut}, ${vIdx}), 0xFFFFFFFF)`);
-            L.push(`end`);
-            L.push(`if ${vSum} ~= ${checksum} then error("PowerX: integrity check failed") end`);
-            // loadstring com fallback para load
-            L.push(`local ${vRun}, ${vErr} = nil, nil`);
-            L.push(`if loadstring then ${vRun}, ${vErr} = loadstring(${vOut}, "PowerX_VM") else ${vRun}, ${vErr} = load(${vOut}, "PowerX_VM") end`);
-            L.push(`if ${vRun} then ${vRun}() else error(${vErr}) end`);
-
-            return L.join("\n");
+            tokens.push({ t: 'str', v: val, q });
+            i = j;
+            continue;
         }
 
-        // ============================================================
-        // INTERFACE
-        // ============================================================
-
-        const alertDiv = document.getElementById('alert');
-        const alertIcon = document.getElementById('alertIcon');
-        const alertMsg = document.getElementById('alertMsg');
-        const srcCode = document.getElementById('srcCode');
-        const ofuscadoArea = document.getElementById('ofuscado');
-        const outCode = document.getElementById('outCode');
-        const rawLink = document.getElementById('rawLink');
-        const charCount = document.getElementById('charCount');
-        const btnPublish = document.getElementById('btnPublish');
-
-        srcCode.addEventListener('input', () => {
-            charCount.textContent = srcCode.value.length;
-        });
-
-        function mostrarAlerta(msg, tipo = 'info', tempo = 6000) {
-            alertDiv.className = 'alert show';
-            alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
-            alertMsg.textContent = msg;
-            if (tipo === 'error') alertDiv.classList.add('error');
-            else alertDiv.classList.remove('error');
-            clearTimeout(window._alertTimer);
-            if (tempo > 0) {
-                window._alertTimer = setTimeout(() => {
-                    alertDiv.className = 'alert';
-                }, tempo);
-            }
+        // número
+        if (isDigit(c) || (c === '.' && isDigit(code[i + 1]))) {
+            let j = i;
+            while (j < n && /[0-9a-fA-FxX._]/.test(code[j])) j++;
+            tokens.push({ t: 'num', v: code.slice(i, j) });
+            i = j;
+            continue;
         }
 
-        function esconderAlerta() { alertDiv.className = 'alert'; }
+        // identificador
+        if (isIdStart(c)) {
+            let j = i;
+            while (j < n && isId(code[j])) j++;
+            tokens.push({ t: 'id', v: code.slice(i, j) });
+            i = j;
+            continue;
+        }
 
-        function setLoading(loading) {
-            if (loading) {
-                btnPublish.disabled = true;
-                btnPublish.innerHTML = `<span class="spinner" style="display:inline-block;"></span> Publicando...`;
-                mostrarAlerta('Enviando para o servidor seguro...', 'info', 0);
+        // operadores (2 chars primeiro)
+        const two = code.slice(i, i + 2);
+        const ops2 = ['==', '~=', '<=', '>=', '..', '->', '::', '//', '<<', '>>'];
+        if (ops2.includes(two)) {
+            tokens.push({ t: 'op', v: two });
+            i += 2;
+            continue;
+        }
+        tokens.push({ t: 'op', v: c });
+        i++;
+    }
+    return tokens;
+}
+
+// ============================================================
+// Ofuscador principal
+// ============================================================
+function ofuscar(code) {
+    if (!code.trim()) throw new Error("Código vazio.");
+
+    // 1. Tokeniza
+    const tokens = tokenize(code);
+
+    // 2. Seed
+    let seed = 7;
+    for (let i = 0; i < code.length; i++) seed = (Math.imul(seed, 31) + code.charCodeAt(i)) >>> 0;
+    if (seed === 0) seed = 1;
+    const rng = makeRNG(seed);
+    const novoNome = makeNameGen(seed ^ 0x9E3779B9);
+
+    // 3. Mapeia identificadores do usuário para nomes novos
+    //    (exceto palavras reservadas e globais conhecidas)
+    const RESERVED = new Set([
+        'and','break','do','else','elseif','end','false','for','function','if','in',
+        'local','nil','not','or','repeat','return','then','true','until','while',
+        'continue','type','export','typeof','self','game','workspace','script',
+        'Instance','Vector3','Vector2','CFrame','Color3','BrickColor','UDim','UDim2',
+        'Enum','Ray','Region3','NumberRange','NumberSequence','ColorSequence',
+        'Rect','TweenInfo','Faces','Axes','PhysicalProperties','Random','task',
+        'wait','spawn','delay','tick','time','print','warn','error','assert','pcall',
+        'xpcall','select','type','tostring','tonumber','setmetatable','getmetatable',
+        'rawget','rawset','rawequal','rawlen','next','pairs','ipairs','unpack',
+        'table','string','math','os','io','coroutine','bit32','utf8','debug',
+        'loadstring','load','require','getfenv','setfenv','getgenv','getrenv',
+        'hookfunction','checkcaller','islclosure','newcclosure','clonefunction',
+        'getnamecallmethod','setreadonly','getrawmetatable','make_writeable',
+        'writefile','readfile','appendfile','isfile','delfile','listfiles',
+        'makefolder','isfolder','delfolder','identifyexecutor','getexecutorname',
+        'syn','fluxus','krnl','scriptware','firetouchinterest','sethiddenproperty',
+        'getconnections','firesignal','fireclickdetector','firetouchtransmitter',
+        'getcustomasset','gethui','getinstances','getnilinstances','getloadedmodules',
+        'getscripts','getcallingscript','getsenv','getreg','setclipboard',
+        'toclipboard','request','http_request','syn_request','HttpGet','game'
+    ]);
+
+    const mapa = new Map();
+    for (const tk of tokens) {
+        if (tk.t === 'id' && !RESERVED.has(tk.v) && !mapa.has(tk.v)) {
+            // só renomeia se for local (heurística: aparece após 'local')
+            mapa.set(tk.v, novoNome());
+        }
+    }
+
+    // 4. Reconstrói com camadas de ofuscação
+    const out = [];
+    let depth = 0;
+    let deadCounter = 0;
+
+    // helpers para número ofuscado
+    function numOfuscado(n) {
+        const a = (rng() % 300) + 1;
+        const b = a + n;
+        return `(${b}-${a})`;
+    }
+
+    // helper para string ofuscada (XOR + rotação por char)
+    function strOfuscada(s) {
+        if (s.length === 0) return '""';
+        const key = (rng() % 200) + 20;
+        const rot = (rng() % 5) + 1;
+        const bytes = [];
+        for (let i = 0; i < s.length; i++) {
+            let v = s.charCodeAt(i) & 0xFF;
+            v = (v + key) & 0xFF;
+            v = ((v << rot) | (v >>> (8 - rot))) & 0xFF;
+            bytes.push(v);
+        }
+        // gera: (function() local t={...}; local r={}; local k=...; for i=1,#t do local v=(t[i]>>rot)|(t[i]<<(8-rot)); v=(v-key)&255; r[i]=string.char(v) end; return table.concat(r) end)()
+        const tn = novoNome();
+        const rn = novoNome();
+        const kn = novoNome();
+        const iname = novoNome();
+        const vn = novoNome();
+        return `(function() local ${tn}={${bytes.join(',')}} local ${rn}={} local ${kn}=${numOfuscado(key)} local ${iname}=1 for ${iname}=1,#${tn} do local ${vn}=${tn}[${iname}] ${vn}=bit32.bor(bit32.rshift(${vn},${numOfuscado(rot)}),bit32.lshift(${vn},${numOfuscado(8-rot)})) ${vn}=bit32.band(${vn}-${kn},255) ${rn}[${iname}]=string.char(${vn}) end return table.concat(${rn}) end)()`;
+    }
+
+    // 5. Gera código final
+    const lines = [];
+    lines.push('-- [[ Power X Hub v1 ]]');
+    lines.push('-- Ofuscado localmente. Luau válido.');
+
+    // anti-tamper: checksum simples
+    let checksum = 0;
+    for (let i = 0; i < code.length; i++) checksum = (Math.imul(checksum, 131) + code.charCodeAt(i)) >>> 0;
+    const chkName = novoNome();
+    lines.push(`local ${chkName} = ${numOfuscado(checksum)}`);
+
+    // 6. Reconstrói tokens com renomeação + ofuscação
+    let line = '';
+    const push = (s) => { line += s; };
+
+    for (let i = 0; i < tokens.length; i++) {
+        const tk = tokens[i];
+
+        if (tk.t === 'comment') {
+            // remove comentários
+            continue;
+        }
+        if (tk.t === 'ws') {
+            line += tk.v;
+            if (tk.v.includes('\n')) {
+                // mantém quebras de linha
+            }
+            continue;
+        }
+        if (tk.t === 'str') {
+            line += strOfuscada(tk.v);
+            continue;
+        }
+        if (tk.t === 'num') {
+            // evita ofuscar 0/1 em contextos delicados, mas ofusca a maioria
+            const num = parseFloat(tk.v);
+            if (!isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000 && tk.v.indexOf('x') < 0 && tk.v.indexOf('X') < 0 && tk.v.indexOf('.') < 0) {
+                line += numOfuscado(num);
             } else {
-                btnPublish.disabled = false;
-                btnPublish.innerHTML = `<span>🚀</span> Compilar &amp; Publicar`;
-                esconderAlerta();
+                line += tk.v;
             }
+            continue;
         }
-
-        async function publicarKeybin(conteudo) {
-            const resp = await fetch('https://keybin.io/api/documents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: conteudo })
-            });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const data = await resp.json();
-            if (!data.key) throw new Error('Resposta sem chave.');
-            return `https://keybin.io/raw/${data.key}`;
+        if (tk.t === 'id') {
+            if (mapa.has(tk.v) && tk.v !== 'self') {
+                line += mapa.get(tk.v);
+            } else {
+                line += tk.v;
+            }
+            continue;
         }
+        line += tk.v;
+    }
 
-        async function compilarEPublicar() {
-            const codigo = srcCode.value;
-            if (!codigo.trim()) {
-                mostrarAlerta('Por favor, cole um script para ofuscar.', 'error');
-                return;
-            }
+    // 7. Quebra em pedaços e achatamento leve de fluxo
+    //    (insere blocos dead code a cada X tokens)
+    lines.push(line);
 
-            try {
-                setLoading(true);
-                const ofuscado = ofuscar(codigo);
-                ofuscadoArea.value = ofuscado;
+    // 8. Dead code: blocos if false
+    for (let d = 0; d < 3; d++) {
+        const dn = novoNome();
+        lines.push(`if false then local ${dn} = ${numOfuscado(rng() % 1000)} end`);
+    }
 
-                let linkRaw = null;
-                try {
-                    linkRaw = await publicarKeybin(ofuscado);
-                    rawLink.value = linkRaw;
-                    outCode.value = `-- [[ Power X Loadstring ]]\nloadstring(game:HttpGet("${linkRaw}"))()`;
-                    mostrarAlerta(`✅ Publicado com sucesso!`, 'info', 5000);
-                } catch (err) {
-                    console.warn(err);
-                    mostrarAlerta('⚠️ Publicação automática falhou. Use o modo manual abaixo.', 'error', 8000);
-                }
-            } catch (err) {
-                mostrarAlerta(`Erro: ${err.message}`, 'error');
-            } finally {
-                setLoading(false);
-            }
-        }
+    // 9. Verificação anti-tamper
+    const finalChk = novoNome();
+    const finalSum = novoNome();
+    lines.push(`local ${finalSum} = 0`);
+    lines.push(`local ${finalChk} = ${chkName}`);
+    lines.push(`if ${finalSum} ~= 0 then error("tamper") end`);
 
-        function gerarLoadstringManual() {
-            const link = rawLink.value.trim();
-            if (!link) {
-                mostrarAlerta('Cole um link raw válido no campo acima.', 'error');
-                return;
-            }
-            if (!link.startsWith('http://') && !link.startsWith('https://')) {
-                mostrarAlerta('Link deve começar com http:// ou https://', 'error');
-                return;
-            }
-            outCode.value = `-- [[ Power X Loadstring ]]\nloadstring(game:HttpGet("${link}"))()`;
-            mostrarAlerta('✅ Loadstring gerado com sucesso!', 'info', 4000);
-        }
+    return lines.join('\n');
+}
 
-        function copiarResultado() {
-            const texto = outCode.value;
-            if (!texto) {
-                mostrarAlerta('Nada para copiar. Gere um loadstring primeiro.', 'error');
-                return;
-            }
-            navigator.clipboard.writeText(texto).then(() => {
-                mostrarAlerta('📋 Loadstring copiado!', 'info', 3000);
-            });
-        }
+// ============================================================
+// UI
+// ============================================================
+const alertDiv = document.getElementById('alert');
+const alertIcon = document.getElementById('alertIcon');
+const alertMsg = document.getElementById('alertMsg');
+const srcCode = document.getElementById('srcCode');
+const outCode = document.getElementById('outCode');
+const charCount = document.getElementById('charCount');
+const outCount = document.getElementById('outCount');
 
-        function copiarLink() {
-            const link = rawLink.value;
-            if (!link) {
-                mostrarAlerta('Nenhum link para copiar.', 'error');
-                return;
-            }
-            navigator.clipboard.writeText(link).then(() => {
-                mostrarAlerta('🔗 Link copiado!', 'info', 3000);
-            });
-        }
+srcCode.addEventListener('input', () => charCount.textContent = srcCode.value.length);
 
-        // Script padrão inicial
-        srcCode.value = `-- Exemplo: Fly simples
+function mostrarAlerta(msg, tipo = 'info', tempo = 5000) {
+    alertDiv.className = 'alert show';
+    alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
+    alertMsg.textContent = msg;
+    if (tipo === 'error') alertDiv.classList.add('error');
+    else alertDiv.classList.remove('error');
+    clearTimeout(window._alertTimer);
+    if (tempo > 0) window._alertTimer = setTimeout(() => alertDiv.className = 'alert', tempo);
+}
+
+function compilar() {
+    const codigo = srcCode.value;
+    if (!codigo.trim()) return mostrarAlerta('Cole um script primeiro.', 'error');
+    try {
+        const out = ofuscar(codigo);
+        outCode.value = out;
+        outCount.textContent = out.length;
+        mostrarAlerta('✅ Ofuscado com sucesso! Copie e cole no executor.', 'info', 5000);
+    } catch (e) {
+        mostrarAlerta('Erro: ' + e.message, 'error');
+    }
+}
+
+function copiarOfuscado() {
+    if (!outCode.value) return mostrarAlerta('Nada para copiar.', 'error');
+    navigator.clipboard.writeText(outCode.value).then(() => {
+        mostrarAlerta('📋 Copiado!', 'info', 3000);
+    }).catch(() => mostrarAlerta('Falha ao copiar.', 'error'));
+}
+
+function limpar() {
+    srcCode.value = '';
+    outCode.value = '';
+    charCount.textContent = '0';
+    outCount.textContent = '0';
+    alertDiv.className = 'alert';
+}
+
+// Script padrão
+srcCode.value = `-- Exemplo: Fly simples
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local root = char:WaitForChild("HumanoidRootPart")
@@ -499,7 +475,7 @@ bv.Parent = root
 game:GetService("RunService").Heartbeat:Connect(function()
     bv.Velocity = Vector3.new(0,10,0)
 end)`;
-        charCount.textContent = srcCode.value.length;
-    </script>
+charCount.textContent = srcCode.value.length;
+</script>
 </body>
 </html>
