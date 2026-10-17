@@ -3,63 +3,49 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>⚡ Power X Hub · Fortress Obfuscator</title>
+<title>⚡ Power X Hub · Blackout Obfuscator</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #090b11; color: #e2e8f0;
-    min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
-}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #090b11; color: #e2e8f0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
 .container { width: 100%; max-width: 960px; margin: 0 auto; }
-.card {
-    background: linear-gradient(145deg, #141823, #0d1019);
-    border-radius: 28px; padding: 38px 34px;
-    box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
-    transition: box-shadow 0.3s;
-}
+.card { background: linear-gradient(145deg, #141823, #0d1019); border-radius: 28px; padding: 38px 34px; box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07); transition: box-shadow 0.3s; }
 .card:hover { box-shadow: 0 35px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,255,183,0.15); }
 .header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .header .icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(0,255,183,0.25)); }
-.header h1 {
-    font-size: 27px; font-weight: 700;
-    background: linear-gradient(135deg, #ff0055, #ff8800);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    letter-spacing: -0.3px;
-}
-.header .tag { margin-left: auto; background: rgba(255,0,85,0.08); color: #ff0055; font-size: 11px; font-weight: 600; padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(255,0,85,0.15); text-transform: uppercase; letter-spacing: 0.8px; }
-.alert { padding: 14px 20px; border-radius: 16px; background: rgba(255,0,85,0.05); border: 1px solid rgba(255,0,85,0.15); color: #ff0055; font-size: 14px; font-weight: 500; display: none; align-items: center; gap: 12px; margin-bottom: 24px; }
+.header h1 { font-size: 27px; font-weight: 700; background: linear-gradient(135deg, #00ffb7, #00b894); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.header .tag { margin-left: auto; background: rgba(0,255,183,0.08); color: #00ffb7; font-size: 11px; font-weight: 600; padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(0,255,183,0.15); text-transform: uppercase; }
+.alert { padding: 14px 20px; border-radius: 16px; background: rgba(0,255,183,0.05); border: 1px solid rgba(0,255,183,0.15); color: #00ffb7; font-size: 14px; font-weight: 500; display: none; align-items: center; gap: 12px; margin-bottom: 24px; }
 .alert.show { display: flex; }
 .alert.error { background: rgba(255,71,87,0.07); border-color: rgba(255,71,87,0.2); color: #ff6b7a; }
-.alert .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(255,0,85,0.15); border-top-color: #ff0055; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+.alert .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(0,255,183,0.15); border-top-color: #00ffb7; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .field { margin-bottom: 22px; }
 .field label { display: block; font-size: 14px; font-weight: 600; color: #b6c2d4; margin-bottom: 8px; }
-textarea, input[type="text"] { width: 100%; padding: 14px 18px; background: #0b0e16; border: 1px solid #232d3e; border-radius: 14px; color: #dce4f0; font-family: 'Cascadia Code','Consolas',monospace; font-size: 14px; line-height: 1.6; resize: vertical; }
-textarea:focus, input[type="text"]:focus { outline: none; border-color: #ff0055; }
+textarea, input[type="text"] { width: 100%; padding: 14px 18px; background: #0b0e16; border: 1px solid #232d3e; border-radius: 14px; color: #dce4f0; font-family: 'Cascadia Code','Consolas',monospace; font-size: 14px; resize: vertical; }
+textarea:focus, input:focus { outline: none; border-color: #00ffb7; }
 textarea[readonly] { background: #080b12; color: #8b9bb0; }
 .char-counter { text-align: right; font-size: 12px; color: #4a5a6e; margin-top: 5px; }
 .inline-link { display: flex; gap: 12px; align-items: center; background: #0b0e16; padding: 6px 14px 6px 18px; border-radius: 14px; border: 1px solid #1e2a3a; margin-top: 6px; }
-.inline-link input { flex: 1; border: none; background: transparent; padding: 10px 0; color: #ff0055; font-size: 14px; font-family: monospace; }
-.inline-link .copy-mini { background: #1e293b; border: none; color: #cbd5e1; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.inline-link input { flex: 1; border: none; background: transparent; padding: 10px 0; color: #00ffb7; font-family: monospace; }
+.inline-link .copy-mini { background: #1e293b; border: none; color: #cbd5e1; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 24px; }
 .btn { flex: 1 1 160px; padding: 15px 22px; border: none; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; background: #1f2937; color: #e2e8f0; }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
-.btn-primary { background: linear-gradient(135deg, #ff0055, #ff8800); color: #fff; }
-.btn-primary:hover { box-shadow: 0 8px 30px rgba(255,0,85,0.3); }
+.btn-primary { background: linear-gradient(135deg, #00ffb7, #00b380); color: #0a0c12; }
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(0,255,183,0.3); }
 .btn-secondary { background: #334155; color: #fff; }
 .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
 .footer { margin-top: 30px; text-align: center; font-size: 13px; color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 24px; }
-.footer a { color: #ff0055; text-decoration: none; }
+.footer a { color: #00ffb7; text-decoration: none; }
 </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
         <div class="header">
-            <span class="icon">🔥</span>
+            <span class="icon">⚡</span>
             <h1>Power X Hub</h1>
-            <span class="tag">Fortress Obfuscator</span>
+            <span class="tag">Blackout v7</span>
         </div>
 
         <div id="alert" class="alert">
@@ -86,7 +72,7 @@ textarea[readonly] { background: #080b12; color: #8b9bb0; }
         </div>
 
         <div class="field">
-            <label>🔗 Link Raw (se quiser colar manualmente)</label>
+            <label>🔗 Link Raw (manual)</label>
             <div class="inline-link">
                 <input type="text" id="rawLink" placeholder="https://pastebin.com/raw/..." />
                 <button class="copy-mini" onclick="copiarLink()">Copiar</button>
@@ -94,32 +80,29 @@ textarea[readonly] { background: #080b12; color: #8b9bb0; }
         </div>
 
         <div class="field">
-            <label>🔐 Código Ofuscado (Fortress)</label>
-            <textarea id="ofuscado" readonly placeholder="Código Fortress aparecerá aqui..." rows="4"></textarea>
+            <label>🔐 Código Ofuscado</label>
+            <textarea id="ofuscado" readonly placeholder="Código final aparecerá aqui..." rows="4"></textarea>
         </div>
 
         <div class="field" style="margin-bottom:0;">
-            <label>📦 Script Final (Loadstring)</label>
-            <textarea id="outCode" readonly placeholder="O loadstring final..." rows="3"></textarea>
+            <label>📦 Loadstring Final</label>
+            <textarea id="outCode" readonly placeholder="loadstring(game:HttpGet('...'))()" rows="3"></textarea>
         </div>
 
         <div class="footer">
-            🔒 Ofuscação polimórfica com VM + Cifra de Chave Polinomial.<br />
-            Publicação via <a href="https://keybin.io" target="_blank">Keybin</a>.
+            🔒 Cifra de bytecode + ofuscação de strings.<br />
+            <a href="https://keybin.io" target="_blank">Keybin</a> para publicação.
         </div>
     </div>
 </div>
 
 <script>
 // ============================================================
-// 1. COMPILADOR DE BYTECODE (Motor da VM)
+// 1. COMPILADOR
 // ============================================================
-const OPCODES = {
-    'LOADK': 1, 'GETGLOBAL': 2, 'SETGLOBAL': 3, 'CALL': 4,
-    'RETURN': 5, 'ADD': 6, 'SUB': 7, 'MUL': 8, 'DIV': 9
-};
-
+const OPCODES = { 'LOADK': 1, 'GETGLOBAL': 2, 'SETGLOBAL': 3, 'CALL': 4, 'RETURN': 5 };
 let constantTable = [];
+
 function addConstant(val) {
     if (typeof val === 'number') return val;
     let idx = constantTable.indexOf(val);
@@ -129,7 +112,6 @@ function addConstant(val) {
 
 function tokenize(code) {
     const tokens = [];
-    // Remove comentários para não quebrar o parser
     code = code.replace(/--\[\[[\s\S]*?\]\]/g, '').replace(/--[^\n]*/g, '');
     const regex = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\d+\.?\d*|\w+|[+\-*\/=<>~#{}()\[\];:,.])/g;
     let match;
@@ -151,7 +133,6 @@ function compileToBytecode(code) {
     while (i < tokens.length) {
         const t = tokens[i];
         if (t.type === 'identifier') {
-            // Chamada de função
             if (i+1 < tokens.length && tokens[i+1].value === '(') {
                 bytecode.push(OPCODES.GETGLOBAL, addConstant(t.value));
                 i += 2;
@@ -168,7 +149,6 @@ function compileToBytecode(code) {
                 bytecode.push(OPCODES.CALL, args);
                 continue;
             }
-            // Atribuição
             if (i+1 < tokens.length && tokens[i+1].value === '=') {
                 bytecode.push(OPCODES.SETGLOBAL, addConstant(t.value));
                 i += 2;
@@ -186,126 +166,111 @@ function compileToBytecode(code) {
 }
 
 // ============================================================
-// 2. CIFRA POLIMORFICA (O Segredo do Fortress)
+// 2. CRIPTOGRAFIA E OFUSCAÇÃO (BLACKOUT)
 // ============================================================
-// Transforma o bytecode num array de números usando uma função matemática.
-// A chave não é um número fixo, é o resultado de um polinômio.
-function cifrarFortress(bytecodeArray) {
-    // Escolhe uma chave base aleatória
-    const keyBase = Math.floor(Math.random() * 200) + 50;
-    const shift = Math.floor(Math.random() * 50) + 10;
-    
-    const encrypted = bytecodeArray.map((val, index) => {
-        // A chave muda a cada posição: (keyBase * index^2) + shift
-        const dynamicKey = (keyBase * Math.pow(index % 10, 2)) + shift;
-        // Cifra: (valor XOR chave) + chave
-        return ((val ^ dynamicKey) + dynamicKey) % 256;
+function cifrarDados(array, key1, key2) {
+    return array.map((val, idx) => {
+        const k = (key1 * Math.pow(idx % 10, 2)) + key2;
+        return ((val ^ k) + k) % 256;
     });
-    
-    return {
-        data: encrypted,
-        // A "chave" que vai pro script é apenas os parâmetros iniciais da função
-        key1: keyBase,
-        key2: shift
-    };
 }
 
-// ============================================================
-// 3. GERADOR DO SCRIPT FINAL (A Fortaleza)
-// ============================================================
+// Transforma string em array de números (Proteção de String)
+function ofuscarString(str, key) {
+    const encrypted = [];
+    for (let i = 0; i < str.length; i++) {
+        encrypted.push((str.charCodeAt(i) ^ key) + key);
+    }
+    return encrypted;
+}
+
 function gerarScriptFortress(compiled) {
-    // Cifra o bytecode
-    const encryptedBC = cifrarFortress(compiled.bytecode);
+    const k1 = Math.floor(Math.random() * 200) + 50;
+    const k2 = Math.floor(Math.random() * 50) + 10;
     
-    // Cifra a tabela de constantes (strings) com Base64
-    const b64Constants = btoa(unescape(encodeURIComponent(JSON.stringify(compiled.constants))));
+    // Cifra o bytecode
+    const encBC = cifrarDados(compiled.bytecode, k1, k2);
+    
+    // Cifra as constantes (strings)
+    const strKey = Math.floor(Math.random() * 50) + 20;
+    const encConst = compiled.constants.map(c => {
+        if (typeof c === 'string') return { type: 'str', data: ofuscarString(c, strKey) };
+        return { type: 'num', data: c };
+    });
 
-    // Nomes de variáveis totalmente aleatórios (polimorfismo)
+    // Gera nomes de variáveis absurdamente aleatórios
     const v = (n) => `_${Math.random().toString(36).substring(2, 10)}${n}`;
-    const v_enc = v('enc'), v_k1 = v('k1'), v_k2 = v('k2'), v_bc = v('bc');
-    const v_const = v('const'), v_stack = v('stack'), v_pc = v('pc');
-    const v_op = v('op'), v_i = v('i'), v_key = v('key'), v_arg = v('arg');
-    const v_func = v('func'), v_args = v('args');
-
-    // Código Lua da VM, agora com a camada de decifração
-    return `-- [[ Power X Fortress ]]\n` +
-    `local ${v_enc} = {${encryptedBC.data.join(',')}}\n` +
-    `local ${v_k1} = ${encryptedBC.key1}\n` +
-    `local ${v_k2} = ${encryptedBC.key2}\n` +
-    `local ${v_const} = {${compiled.constants.map(c => typeof c === 'string' ? `"${c}"` : c).join(',')}}\n` +
-    `local ${v_bc} = {}\n` +
-    `-- Camada 1: Decifrar o Bytecode\n` +
-    `for ${v_i} = 1, #${v_enc} do\n` +
-    `    local ${v_key} = (${v_k1} * math.pow((${v_i} - 1) % 10, 2)) + ${v_k2}\n` +
-    `    local val = (${v_enc}[${v_i}] - ${v_key}) % 256\n` +
-    `    table.insert(${v_bc}, bit32.bxor(val, ${v_key}))\n` +
-    `end\n` +
-    `-- Camada 2: Executar a VM\n` +
-    `local ${v_stack} = {}\n` +
-    `local ${v_pc} = 1\n` +
-    `while ${v_pc} <= #${v_bc} do\n` +
-    `    local ${v_op} = ${v_bc}[${v_pc}]\n` +
-    `    if ${v_op} == 1 then -- LOADK\n` +
-    `        ${v_pc} = ${v_pc} + 1\n` +
-    `        table.insert(${v_stack}, ${v_const}[${v_bc}[${v_pc}]])\n` +
-    `    elseif ${v_op} == 2 then -- GETGLOBAL\n` +
-    `        ${v_pc} = ${v_pc} + 1\n` +
-    `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
-    `        table.insert(${v_stack}, _G[name] or game[name] or workspace[name] or getfenv()[name])\n` +
-    `    elseif ${v_op} == 3 then -- SETGLOBAL\n` +
-    `        ${v_pc} = ${v_pc} + 1\n` +
-    `        local name = ${v_const}[${v_bc}[${v_pc}]]\n` +
-    `        local val = table.remove(${v_stack})\n` +
-    `        _G[name] = val\n` +
-    `    elseif ${v_op} == 4 then -- CALL\n` +
-    `        ${v_pc} = ${v_pc} + 1\n` +
-    `        local nargs = ${v_bc}[${v_pc}]\n` +
-    `        local args = {}\n` +
-    `        for i = 1, nargs do table.insert(args, 1, table.remove(${v_stack})) end\n` +
-    `        local func = table.remove(${v_stack})\n` +
-    `        local ok, res = pcall(func, table.unpack(args))\n` +
-    `        table.insert(${v_stack}, res)\n` +
-    `    elseif ${v_op} == 5 then -- RETURN\n` +
-    `        break\n` +
+    
+    // Script Lua gerado
+    return `-- [[ Power X Blackout ]]\n` +
+    `local ${v('e')} = {${encBC.join(',')}}\n` +
+    `local ${v('k')} = {${k1}, ${k2}}\n` +
+    `local ${v('c')} = {\n` +
+    encConst.map(c => {
+        if (c.type === 'num') return `    ${c.data}`;
+        return `    {${c.data.join(',')}}`; // Array de bytes da string
+    }).join(',\n') + `\n}\n` +
+    `local ${v('b')} = {}\n` +
+    `local ${v('s')} = ${strKey}\n` +
+    `-- Decifra Strings\n` +
+    `for ${v('i')} = 1, #${v('c')} do\n` +
+    `    if type(${v('c')}[${v('i')}]) == "table" then\n` +
+    `        local ${v('str')} = ""\n` +
+    `        for j = 1, #${v('c')}[${v('i')}] do\n` +
+    `            local v = ${v('c')}[${v('i')}][j]\n` +
+    `            ${v('str')} = ${v('str')} .. string.char(bit32.bxor(v - ${v('s')}, ${v('s')}))\n` +
+    `        end\n` +
+    `        ${v('c')}[${v('i')}] = ${v('str')}\n` +
     `    end\n` +
-    `    ${v_pc} = ${v_pc} + 1\n` +
+    `end\n` +
+    `-- Decifra Bytecode\n` +
+    `for ${v('i')} = 1, #${v('e')} do\n` +
+    `    local key = (${v('k')}[1] * math.pow((${v('i')} - 1) % 10, 2)) + ${v('k')}[2]\n` +
+    `    local val = (${v('e')}[${v('i')}] - key) % 256\n` +
+    `    table.insert(${v('b')}, bit32.bxor(val, key))\n` +
+    `end\n` +
+    `-- Executa VM\n` +
+    `local ${v('st')} = {}\n` +
+    `local ${v('pc')} = 1\n` +
+    `while ${v('pc')} <= #${v('b')} do\n` +
+    `    local ${v('op')} = ${v('b')}[${v('pc')}]\n` +
+    `    if ${v('op')} == 1 then\n` +
+    `        ${v('pc')} = ${v('pc')} + 1; table.insert(${v('st')}, ${v('c')}[${v('b')}[${v('pc')}]])\n` +
+    `    elseif ${v('op')} == 2 then\n` +
+    `        ${v('pc')} = ${v('pc')} + 1; local name = ${v('c')}[${v('b')}[${v('pc')}]]\n` +
+    `        table.insert(${v('st')}, _G[name] or game[name] or workspace[name])\n` +
+    `    elseif ${v('op')} == 3 then\n` +
+    `        ${v('pc')} = ${v('pc')} + 1; local name = ${v('c')}[${v('b')}[${v('pc')}]]\n` +
+    `        _G[name] = table.remove(${v('st')})\n` +
+    `    elseif ${v('op')} == 4 then\n` +
+    `        ${v('pc')} = ${v('pc')} + 1; local n = ${v('b')}[${v('pc')}]; local args = {}\n` +
+    `        for i = 1, n do table.insert(args, 1, table.remove(${v('st')})) end\n` +
+    `        local ok, res = pcall(table.remove(${v('st')}), table.unpack(args)); table.insert(${v('st')}, res)\n` +
+    `    elseif ${v('op')} == 5 then break end\n` +
+    `    ${v('pc')} = ${v('pc')} + 1\n` +
     `end\n`;
 }
 
 // ============================================================
-// 4. SITE LÓGICA
+// 3. SITE LÓGICA
 // ============================================================
 async function publicarHastebin(conteudo) {
-    const resp = await fetch('https://keybin.io/api/documents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: conteudo })
-    });
+    const resp = await fetch('https://keybin.io/api/documents', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: conteudo }) });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     if (!data.key) throw new Error('Resposta sem chave.');
     return `https://keybin.io/raw/${data.key}`;
 }
 
-const alertDiv = document.getElementById('alert');
-const alertIcon = document.getElementById('alertIcon');
-const alertMsg = document.getElementById('alertMsg');
-const srcCode = document.getElementById('srcCode');
-const ofuscadoArea = document.getElementById('ofuscado');
-const outCode = document.getElementById('outCode');
-const rawLink = document.getElementById('rawLink');
-const charCount = document.getElementById('charCount');
+const alertDiv = document.getElementById('alert'), alertIcon = document.getElementById('alertIcon'), alertMsg = document.getElementById('alertMsg');
+const srcCode = document.getElementById('srcCode'), ofuscadoArea = document.getElementById('ofuscado'), outCode = document.getElementById('outCode'), rawLink = document.getElementById('rawLink'), charCount = document.getElementById('charCount');
 
 srcCode.addEventListener('input', () => { charCount.textContent = srcCode.value.length; });
 
 function mostrarAlerta(msg, tipo = 'info', tempo = 6000) {
-    alertDiv.className = 'alert show';
-    alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
-    alertMsg.textContent = msg;
-    if (tipo === 'error') alertDiv.classList.add('error');
-    else alertDiv.classList.remove('error');
-    clearTimeout(window._alertTimer);
-    if (tempo > 0) window._alertTimer = setTimeout(() => { alertDiv.className = 'alert'; }, tempo);
+    alertDiv.className = 'alert show'; alertIcon.textContent = tipo === 'error' ? '❌' : '✅'; alertMsg.textContent = msg;
+    if (tipo === 'error') alertDiv.classList.add('error'); else alertDiv.classList.remove('error');
+    clearTimeout(window._alertTimer); if (tempo > 0) window._alertTimer = setTimeout(() => { alertDiv.className = 'alert'; }, tempo);
 }
 
 async function compilarEPublicar() {
@@ -320,13 +285,11 @@ async function compilarEPublicar() {
             const link = await publicarHastebin(scriptFinal);
             rawLink.value = link;
             outCode.value = `loadstring(game:HttpGet("${link}"))()`;
-            mostrarAlerta('✅ Fortress compilado e publicado!', 'info', 5000);
+            mostrarAlerta('✅ Blackout compilado e publicado!', 'info', 5000);
         } catch (e) {
             mostrarAlerta('⚠️ Publicação falhou. Use o modo manual.', 'error', 8000);
         }
-    } catch (e) {
-        mostrarAlerta(`Erro na compilação: ${e.message}`, 'error');
-    }
+    } catch (e) { mostrarAlerta(`Erro: ${e.message}`, 'error'); }
 }
 
 function gerarLoadstringManual() {
@@ -336,18 +299,11 @@ function gerarLoadstringManual() {
     mostrarAlerta('✅ Loadstring gerado!', 'info', 3000);
 }
 
-function copiarResultado() {
-    if (!outCode.value) return;
-    navigator.clipboard.writeText(outCode.value).then(() => mostrarAlerta('📋 Copiado!', 'info', 2000));
-}
-
-function copiarLink() {
-    if (!rawLink.value) return;
-    navigator.clipboard.writeText(rawLink.value).then(() => mostrarAlerta('🔗 Copiado!', 'info', 2000));
-}
+function copiarResultado() { if (!outCode.value) return; navigator.clipboard.writeText(outCode.value).then(() => mostrarAlerta('📋 Copiado!', 'info', 2000)); }
+function copiarLink() { if (!rawLink.value) return; navigator.clipboard.writeText(rawLink.value).then(() => mostrarAlerta('🔗 Copiado!', 'info', 2000)); }
 
 // Exemplo inicial
-srcCode.value = `local player = game.Players.LocalPlayer\nlocal char = player.Character or player.CharacterAdded:Wait()\nprint("Power X Fortress Ativado")`;
+srcCode.value = `local player = game.Players.LocalPlayer\nlocal char = player.Character or player.CharacterAdded:Wait()\nprint("Power X Blackout Ativo")`;
 charCount.textContent = srcCode.value.length;
 </script>
 </body>
