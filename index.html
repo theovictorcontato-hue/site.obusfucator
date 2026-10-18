@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>⚡ Power X Hub · Obfuscator v1</title>
+<title>⚡ Power X Hub · Obfuscator v1 (fixed)</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -96,20 +96,17 @@ textarea[readonly] { background: #080b12; color: #8b9bb0; }
         <div class="header">
             <span class="icon">⚡</span>
             <h1>Power X Hub</h1>
-            <span class="tag">Obfuscator v1</span>
+            <span class="tag">Obfuscator v1 · fixed</span>
         </div>
-
         <div id="alert" class="alert">
             <span id="alertIcon">✅</span>
             <span id="alertMsg">Pronto!</span>
         </div>
-
         <div class="field">
             <label><span class="emoji">📄</span> Código Original Luau</label>
             <textarea id="srcCode" rows="8" placeholder="-- Cole seu script aqui..."></textarea>
             <div class="char-counter"><span id="charCount">0</span> caracteres</div>
         </div>
-
         <div class="actions">
             <button class="btn btn-primary" onclick="compilar()">
                 <span>🚀</span> Ofuscar
@@ -121,23 +118,17 @@ textarea[readonly] { background: #080b12; color: #8b9bb0; }
                 <span>🧹</span> Limpar
             </button>
         </div>
-
         <div class="field">
             <label><span class="emoji">🔐</span> Código Ofuscado (Luau válido — roda direto)</label>
             <textarea id="outCode" rows="14" readonly placeholder="O código ofuscado aparecerá aqui..."></textarea>
             <div class="char-counter"><span id="outCount">0</span> caracteres</div>
         </div>
-
         <div class="footer">
             🔒 Ofuscação 100% local · Sem <code>loadstring</code> · Luau válido direto
         </div>
     </div>
 </div>
-
 <script>
-// ============================================================
-// RNG xorshift32
-// ============================================================
 function makeRNG(seed) {
     let s = seed >>> 0;
     if (s === 0) s = 1;
@@ -148,8 +139,6 @@ function makeRNG(seed) {
         return s;
     };
 }
-
-// Gerador de nomes únicos
 function makeNameGen(seed) {
     const rng = makeRNG(seed);
     const used = new Set();
@@ -162,15 +151,11 @@ function makeNameGen(seed) {
             for (let i = 0; i < len; i++) name += chars[rng() % chars.length];
             tries++;
         } while (used.has(name) && tries < 100);
-        if (used.has(name)) name = name + "_" + (used.size);
+        if (used.has(name)) name = name + "_" + used.size;
         used.add(name);
         return name;
     };
 }
-
-// ============================================================
-// Tokenizer (com suporte a comentários de bloco --[[ ... ]])
-// ============================================================
 function tokenize(code) {
     const tokens = [];
     let i = 0;
@@ -178,20 +163,14 @@ function tokenize(code) {
     const isIdStart = c => /[A-Za-z_]/.test(c);
     const isId = c => /[A-Za-z0-9_]/.test(c);
     const isDigit = c => /[0-9]/.test(c);
-
     while (i < n) {
         const c = code[i];
-
-        // whitespace
         if (/\s/.test(c)) {
             let j = i;
             while (j < n && /\s/.test(code[j])) j++;
             tokens.push({ t: 'ws', v: code.slice(i, j) });
-            i = j;
-            continue;
+            i = j; continue;
         }
-
-        // comentário de linha ou bloco
         if (c === '-' && code[i + 1] === '-') {
             let j = i + 2;
             let level = 0;
@@ -199,89 +178,110 @@ function tokenize(code) {
                 let k = j + 1;
                 while (code[k] === '=') { level++; k++; }
                 if (code[k] === '[') {
-                    // bloco --[[ ... ]] ou --[=[ ... ]=]
                     const close = ']' + '='.repeat(level) + ']';
                     let end = code.indexOf(close, k + 1);
-                    if (end === -1) end = n;
-                    else end += close.length;
+                    if (end === -1) end = n; else end += close.length;
                     tokens.push({ t: 'comment', v: code.slice(i, end) });
-                    i = end;
-                    continue;
+                    i = end; continue;
                 }
             }
-            // linha normal
             let end = i;
             while (end < n && code[end] !== '\n') end++;
             tokens.push({ t: 'comment', v: code.slice(i, end) });
-            i = end;
-            continue;
+            i = end; continue;
         }
-
-        // string
+        if (c === '[') {
+            let k = i + 1;
+            let level = 0;
+            while (code[k] === '=') { level++; k++; }
+            if (code[k] === '[') {
+                const close = ']' + '='.repeat(level) + ']';
+                let end = code.indexOf(close, k + 1);
+                if (end === -1) end = n; else end += close.length;
+                const content = code.slice(k + 1, end - close.length);
+                tokens.push({ t: 'str', v: content, q: 'long' });
+                i = end; continue;
+            }
+        }
         if (c === '"' || c === "'") {
             const q = c;
             let j = i + 1, val = "";
             while (j < n) {
                 if (code[j] === '\\') {
                     val += code[j] + (code[j + 1] || '');
-                    j += 2;
-                    continue;
+                    j += 2; continue;
                 }
                 if (code[j] === q) { j++; break; }
                 val += code[j];
                 j++;
             }
             tokens.push({ t: 'str', v: val, q });
-            i = j;
-            continue;
+            i = j; continue;
         }
-
-        // número
         if (isDigit(c) || (c === '.' && isDigit(code[i + 1]))) {
             let j = i;
             while (j < n && /[0-9a-fA-FxX._]/.test(code[j])) j++;
             tokens.push({ t: 'num', v: code.slice(i, j) });
-            i = j;
-            continue;
+            i = j; continue;
         }
-
-        // identificador
         if (isIdStart(c)) {
             let j = i;
             while (j < n && isId(code[j])) j++;
             tokens.push({ t: 'id', v: code.slice(i, j) });
-            i = j;
-            continue;
+            i = j; continue;
         }
-
-        // operadores
         const two = code.slice(i, i + 2);
         const ops2 = ['==', '~=', '<=', '>=', '..', '->', '::', '//', '<<', '>>'];
         if (ops2.includes(two)) {
             tokens.push({ t: 'op', v: two });
-            i += 2;
-            continue;
+            i += 2; continue;
         }
         tokens.push({ t: 'op', v: c });
         i++;
     }
     return tokens;
 }
-
-// ============================================================
-// Ofuscador principal
-// ============================================================
+function unescapeLuaString(s) {
+    let out = '';
+    for (let i = 0; i < s.length; i++) {
+        if (s[i] === '\\' && i + 1 < s.length) {
+            const n = s[i + 1];
+            if (n === 'n') { out += '\n'; i++; continue; }
+            if (n === 't') { out += '\t'; i++; continue; }
+            if (n === 'r') { out += '\r'; i++; continue; }
+            if (n === '\\' || n === '"' || n === "'") { out += n; i++; continue; }
+            if (n === 'a') { out += '\x07'; i++; continue; }
+            if (n === 'b') { out += '\b'; i++; continue; }
+            if (n === 'f') { out += '\f'; i++; continue; }
+            if (n === 'v') { out += '\v'; i++; continue; }
+            if (/[0-9]/.test(n)) {
+                let j = i + 1, num = '';
+                while (j < s.length && /[0-9]/.test(s[j]) && num.length < 3) { num += s[j]; j++; }
+                out += String.fromCharCode(parseInt(num, 10) & 0xFF);
+                i = j - 1; continue;
+            }
+            if (n === 'x' && i + 3 < s.length) {
+                const hex = s.slice(i + 2, i + 4);
+                if (/[0-9a-fA-F]{2}/.test(hex)) {
+                    out += String.fromCharCode(parseInt(hex, 16));
+                    i += 3; continue;
+                }
+            }
+            out += s[i];
+        } else {
+            out += s[i];
+        }
+    }
+    return out;
+}
 function ofuscar(code) {
     if (!code.trim()) throw new Error("Código vazio.");
-
     const tokens = tokenize(code);
-
     let seed = 7;
     for (let i = 0; i < code.length; i++) seed = (Math.imul(seed, 31) + code.charCodeAt(i)) >>> 0;
     if (seed === 0) seed = 1;
     const rng = makeRNG(seed);
     const novoNome = makeNameGen(seed ^ 0x9E3779B9);
-
     const RESERVED = new Set([
         'and','break','do','else','elseif','end','false','for','function','if','in',
         'local','nil','not','or','repeat','return','then','true','until','while',
@@ -292,36 +292,51 @@ function ofuscar(code) {
         'task','wait','spawn','delay','tick','time','print','warn','error','assert',
         'pcall','xpcall','select','tostring','tonumber','setmetatable','getmetatable',
         'rawget','rawset','rawequal','rawlen','next','pairs','ipairs','unpack',
-        'table','string','math','os','io','coroutine','bit32','utf8','debug',
+        'table','string','math','os','io','coroutine','bit32','utf8','debug','bit',
         'loadstring','load','require','getfenv','setfenv','getgenv','getrenv',
-        'hookfunction','checkcaller','islclosure','newcclosure','clonefunction',
-        'getnamecallmethod','setreadonly','getrawmetatable','make_writeable',
-        'writefile','readfile','appendfile','isfile','delfile','listfiles',
-        'makefolder','isfolder','delfolder','identifyexecutor','getexecutorname',
-        'syn','fluxus','krnl','scriptware','firetouchinterest','sethiddenproperty',
-        'getconnections','firesignal','fireclickdetector','firetouchtransmitter',
-        'getcustomasset','gethui','getinstances','getnilinstances','getloadedmodules',
-        'getscripts','getcallingscript','getsenv','getreg','setclipboard',
-        'toclipboard','request','http_request','syn_request','HttpGet',
-        'BodyVelocity','MaxForce','Velocity','HumanoidRootPart','Heartbeat',
-        'RunService','Players','LocalPlayer','Character','CharacterAdded',
-        'WaitForChild','Parent','Connect','new'
+        'Players','LocalPlayer','Character','CharacterAdded','WaitForChild','Parent',
+        'Connect','new','FindFirstChild','GetService','Name','UserId','PlayerGui',
+        'Backpack','Camera','CurrentCamera','Humanoid','Head','Torso','RootPart',
+        'Position','Size','Transparency','CanCollide','Anchored','Material','Color',
+        'Value','Enabled','Visible','Text','Image','Mouse','Keyboard','UserInputService',
+        'TweenService','Debris','ReplicatedStorage','ServerStorage','ServerScriptService',
+        'StarterGui','StarterPack','Lighting','SoundService','Chat','Teams',
+        'TeleportService','DataStoreService','MarketplaceService','HttpService',
+        'PathfindingService','CollectionService','ContextActionService','GuiService',
+        'RunService','Heartbeat','RenderStepped','Stepped','Clone','Destroy',
+        'GetChildren','GetDescendants','IsA','FindFirstChildOfClass','GetAttribute',
+        'SetAttribute','Changed','AncestryChanged','ChildAdded','ChildRemoved',
+        'Touched','TouchEnded','GetMouse','GetPlayers','GetPlayerFromCharacter',
+        'CharacterRemoving','Chatted','Kick','LoadCharacter','FireServer','OnServerEvent',
+        'OnClientEvent','InvokeServer','Fire','Disconnect','Wait','Once',
+        'IsDescendantOf','GetFullName','insert','remove','find','sort','concat',
+        'create','pack','clear','byte','char','format','gmatch','gsub','len','lower',
+        'match','rep','reverse','sub','upper','split','abs','acos','asin','atan',
+        'atan2','ceil','clamp','cos','deg','exp','floor','fmod','huge','log','max',
+        'min','modf','noise','pi','pow','rad','random','randomseed','round','sign',
+        'sin','sqrt','tan','clock','date','difftime','resume','running',
+        'status','wrap','yield','arshift','band','bnot','bor','btest','bxor',
+        'extract','lrotate','lshift','replace','rrotate','rshift','Workspace'
     ]);
-
     const mapa = new Map();
+    let prevSignificant = null;
     for (const tk of tokens) {
-        if (tk.t === 'id' && !RESERVED.has(tk.v) && !mapa.has(tk.v)) {
-            mapa.set(tk.v, novoNome());
+        if (tk.t === 'ws' || tk.t === 'comment') continue;
+        if (tk.t === 'id') {
+            const isProperty = prevSignificant && prevSignificant.t === 'op' && (prevSignificant.v === '.' || prevSignificant.v === ':');
+            if (!isProperty && !RESERVED.has(tk.v) && !mapa.has(tk.v)) {
+                mapa.set(tk.v, novoNome());
+            }
         }
+        prevSignificant = tk;
     }
-
     function numOfuscado(n) {
         const a = (rng() % 300) + 1;
         const b = a + n;
-        return `(${b}-${a})`;
+        return '(' + b + '-' + a + ')';
     }
-
-    function strOfuscada(s) {
+    function strOfuscada(raw) {
+        const s = unescapeLuaString(raw);
         if (s.length === 0) return '""';
         const key = (rng() % 200) + 20;
         const rot = (rng() % 5) + 1;
@@ -337,70 +352,71 @@ function ofuscar(code) {
         const kn = novoNome();
         const iname = novoNome();
         const vn = novoNome();
-        return `(function() local ${tn}={${bytes.join(',')}} local ${rn}={} local ${kn}=${numOfuscado(key)} for ${iname}=1,#${tn} do local ${vn}=${tn}[${iname}] ${vn}=bit32.bor(bit32.rshift(${vn},${numOfuscado(rot)}),bit32.lshift(${vn},${numOfuscado(8-rot)})) ${vn}=bit32.band(${vn}-${kn},255) ${rn}[${iname}]=string.char(${vn}) end return table.concat(${rn}) end)()`;
+        return '(function()'
+            + ' local ' + tn + '={' + bytes.join(',') + '};'
+            + ' local ' + rn + '={};'
+            + ' local ' + kn + '=' + numOfuscado(key) + ';'
+            + ' for ' + iname + '=1,#' + tn + ' do'
+            + ' local ' + vn + '=' + tn + '[' + iname + '];'
+            + ' ' + vn + '=bit32.bor(bit32.rshift(' + vn + ',' + numOfuscado(rot) + '),bit32.lshift(' + vn + ',' + numOfuscado(8 - rot) + '));'
+            + ' ' + vn + '=bit32.band(' + vn + '-' + kn + ',255);'
+            + ' ' + rn + '[' + iname + ']=string.char(' + vn + ');'
+            + ' end;'
+            + ' return table.concat(' + rn + ');'
+            + ' end)()';
     }
-
     const lines = [];
-    lines.push('-- [[ Power X Hub v1 ]]');
+    lines.push('-- [[ Power X Hub v1 · fixed ]]');
     lines.push('local bit32 = bit32 or bit');
-
-    let line = '';
+    let out = '';
+    prevSignificant = null;
     for (let i = 0; i < tokens.length; i++) {
         const tk = tokens[i];
         if (tk.t === 'comment') continue;
-        if (tk.t === 'ws') { line += tk.v; continue; }
-        if (tk.t === 'str') { line += strOfuscada(tk.v); continue; }
+        if (tk.t === 'ws') { out += tk.v; continue; }
+        if (tk.t === 'str') { out += strOfuscada(tk.v); prevSignificant = tk; continue; }
         if (tk.t === 'num') {
             const num = parseFloat(tk.v);
-            if (!isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000
-                && tk.v.indexOf('x') < 0 && tk.v.indexOf('X') < 0 && tk.v.indexOf('.') < 0) {
-                line += numOfuscado(num);
-            } else {
-                line += tk.v;
-            }
-            continue;
+            const isPlainInt = !isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000 && !/[xX.]/.test(tk.v);
+            if (isPlainInt) out += numOfuscado(num);
+            else out += tk.v;
+            prevSignificant = tk; continue;
         }
         if (tk.t === 'id') {
-            if (mapa.has(tk.v) && tk.v !== 'self') line += mapa.get(tk.v);
-            else line += tk.v;
-            continue;
+            const isProperty = prevSignificant && prevSignificant.t === 'op' && (prevSignificant.v === '.' || prevSignificant.v === ':');
+            if (!isProperty && mapa.has(tk.v) && tk.v !== 'self') out += mapa.get(tk.v);
+            else out += tk.v;
+            prevSignificant = tk; continue;
         }
-        line += tk.v;
+        out += tk.v;
+        prevSignificant = tk;
     }
-
-    lines.push(line);
-
+    lines.push(out);
     for (let d = 0; d < 3; d++) {
         const dn = novoNome();
-        lines.push(`if false then local ${dn} = ${numOfuscado(rng() % 1000)} end`);
+        lines.push('if false then local ' + dn + '=' + numOfuscado(rng() % 1000) + ' end');
     }
-
     return lines.join('\n');
 }
-
-// ============================================================
-// UI
-// ============================================================
 const alertDiv = document.getElementById('alert');
 const alertIcon = document.getElementById('alertIcon');
-const alertMsg = document.getElementById('alertMsg');
-const srcCode = document.getElementById('srcCode');
-const outCode = document.getElementById('outCode');
+const alertMsg  = document.getElementById('alertMsg');
+const srcCode   = document.getElementById('srcCode');
+const outCode   = document.getElementById('outCode');
 const charCount = document.getElementById('charCount');
-const outCount = document.getElementById('outCount');
-
+const outCount  = document.getElementById('outCount');
 srcCode.addEventListener('input', () => charCount.textContent = srcCode.value.length);
-
-function mostrarAlerta(msg, tipo = 'info', tempo = 5000) {
+function mostrarAlerta(msg, tipo, tempo) {
+    if (tipo === undefined) tipo = 'info';
+    if (tempo === undefined) tempo = 5000;
     alertDiv.className = 'alert show';
     alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
     alertMsg.textContent = msg;
     if (tipo === 'error') alertDiv.classList.add('error');
     else alertDiv.classList.remove('error');
     clearTimeout(window._alertTimer);
-    if (tempo > 0) window._alertTimer = setTimeout(() => alertDiv.className = 'alert', tempo);
+    if (tempo > 0) window._alertTimer = setTimeout(function(){ alertDiv.className = 'alert'; }, tempo);
 }
-
 function compilar() {
     const codigo = srcCode.value;
     if (!codigo.trim()) return mostrarAlerta('Cole um script primeiro.', 'error');
@@ -413,14 +429,12 @@ function compilar() {
         mostrarAlerta('Erro: ' + e.message, 'error');
     }
 }
-
 function copiarOfuscado() {
     if (!outCode.value) return mostrarAlerta('Nada para copiar.', 'error');
-    navigator.clipboard.writeText(outCode.value).then(() => {
+    navigator.clipboard.writeText(outCode.value).then(function(){
         mostrarAlerta('📋 Copiado!', 'info', 3000);
-    }).catch(() => mostrarAlerta('Falha ao copiar.', 'error'));
+    }).catch(function(){ mostrarAlerta('Falha ao copiar.', 'error'); });
 }
-
 function limpar() {
     srcCode.value = '';
     outCode.value = '';
@@ -428,10 +442,7 @@ function limpar() {
     outCount.textContent = '0';
     alertDiv.className = 'alert';
 }
-
-srcCode.value = `-- Exemplo
-local player = game.Players.LocalPlayer
-print("Hello, " .. player.Name)`;
+srcCode.value = '-- Exemplo\nlocal player = game.Players.LocalPlayer\nprint("Hello, " .. player.Name)';
 charCount.textContent = srcCode.value.length;
 </script>
 </body>
