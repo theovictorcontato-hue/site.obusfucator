@@ -1,449 +1,717 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>⚡ Power X Hub · Obfuscator v1 (fixed)</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #090b11; color: #e2e8f0;
-    min-height: 100vh; display: flex; justify-content: center;
-    align-items: center; padding: 20px;
-}
-.container { width: 100%; max-width: 980px; }
-.card {
-    background: linear-gradient(145deg, #141823, #0d1019);
-    border-radius: 28px; padding: 34px;
-    box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,183,0.07);
-}
-.header {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 24px; padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.header .icon { font-size: 34px; }
-.header h1 {
-    font-size: 25px; font-weight: 700;
-    background: linear-gradient(135deg, #00ffb7, #00b894);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.header .tag {
-    margin-left: auto; background: rgba(0,255,183,0.08);
-    color: #00ffb7; font-size: 11px; font-weight: 600;
-    padding: 5px 14px; border-radius: 30px;
-    border: 1px solid rgba(0,255,183,0.15);
-    text-transform: uppercase; letter-spacing: 0.8px;
-}
-.alert {
-    padding: 12px 18px; border-radius: 14px;
-    background: rgba(0,255,183,0.05);
-    border: 1px solid rgba(0,255,183,0.15);
-    color: #00ffb7; font-size: 13px; font-weight: 500;
-    display: none; align-items: center; gap: 10px;
-    margin-bottom: 20px;
-}
-.alert.show { display: flex; }
-.alert.error {
-    background: rgba(255,71,87,0.07);
-    border-color: rgba(255,71,87,0.2); color: #ff6b7a;
-}
-.field { margin-bottom: 20px; }
-.field label {
-    display: block; font-size: 13px; font-weight: 600;
-    color: #b6c2d4; margin-bottom: 7px;
-}
-.field label .emoji { margin-right: 6px; }
-textarea {
-    width: 100%; padding: 13px 16px;
-    background: #0b0e16; border: 1px solid #232d3e;
-    border-radius: 12px; color: #dce4f0;
-    font-family: 'Cascadia Code', 'Consolas', monospace;
-    font-size: 13px; line-height: 1.5; resize: vertical;
-}
-textarea:focus { outline: none; border-color: #00ffb7; }
-textarea[readonly] { background: #080b12; color: #8b9bb0; }
-.char-counter { text-align: right; font-size: 11px; color: #4a5a6e; margin-top: 4px; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 20px; }
-.btn {
-    flex: 1 1 150px; padding: 14px 20px; border: none;
-    border-radius: 12px; font-weight: 700; font-size: 14px;
-    cursor: pointer; display: inline-flex; align-items: center;
-    justify-content: center; gap: 8px;
-    transition: all 0.2s ease; background: #1f2937; color: #e2e8f0;
-}
-.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-.btn-primary { background: linear-gradient(135deg, #00ffb7, #00b380); color: #0a0c12; }
-.btn-primary:hover { box-shadow: 0 8px 30px rgba(0,255,183,0.3); }
-.btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
-.btn-outline:hover { background: #1e293b; border-color: #00ffb7; }
-.footer {
-    margin-top: 24px; text-align: center; font-size: 12px;
-    color: #3d4a5e; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 20px;
-}
-@media (max-width: 650px) {
-    .card { padding: 22px 14px; }
-    .header h1 { font-size: 19px; }
-    .btn { flex: 1 1 100%; }
-    .header .tag { display: none; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Guard - Obfuscador de Código Lua Avançado</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#0a0d14',
+                            card: '#111622',
+                            border: '#1e293b',
+                            accent: '#06b6d4',
+                            purple: '#8b5cf6',
+                            neon: '#10b981',
+                            pink: '#ec4899'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #080a0f;
+            color: #e2e8f0;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #21262d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #30363d;
+        }
+        .cyber-glow {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+        }
+        .cyber-glow-purple {
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+        }
+        .tab-active {
+            border-bottom: 2px solid #06b6d4;
+            color: #06b6d4;
+        }
+    </style>
 </head>
-<body>
-<div class="container">
-    <div class="card">
-        <div class="header">
-            <span class="icon">⚡</span>
-            <h1>Power X Hub</h1>
-            <span class="tag">Obfuscator v1 · fixed</span>
+<body class="min-h-screen flex flex-col bg-[#080a0f] text-slate-200">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid me-0 fa-shield-halved text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+                        LUA GUARD <span class="text-xs px-2 py-0.5 rounded border border-cyan-500/30 text-cyan-400 font-mono ml-2">PRO v2.5</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Ofuscador Avançado Multi-Versão (Lua 5.1+, LuaJIT & Roblox)</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Controls -->
+            <div class="flex items-center gap-3">
+                <button id="btnLoadSample" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white transition bg-slate-900/50 flex items-center gap-2">
+                    <i class="fa-solid fa-code text-cyan-400"></i>
+                    <span>Carregar Exemplo</span>
+                </button>
+                <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Engine Pronta</span>
+                </div>
+            </div>
         </div>
-        <div id="alert" class="alert">
-            <span id="alertIcon">✅</span>
-            <span id="alertMsg">Pronto!</span>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+        <!-- Control Bar & Presets -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 backdrop-blur-sm shadow-xl flex flex-wrap gap-4 items-center justify-between">
+            <!-- Preset Selector -->
+            <div class="flex items-center gap-3">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Nível de Proteção:
+                </label>
+                <div class="inline-flex p-1 bg-slate-950/80 rounded-xl border border-slate-800">
+                    <button type="button" data-preset="light" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Leve</button>
+                    <button type="button" data-preset="medium" class="preset-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 transition">Médio</button>
+                    <button type="button" data-preset="extreme" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Extremo</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                <button id="btnObfuscate" class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Obfuscar Código</span>
+                </button>
+
+                <button id="btnClear" class="px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 text-sm font-medium transition flex items-center gap-2" title="Limpar Tudo">
+                    <i class="fa-solid fa-trash-can text-slate-400"></i>
+                </button>
+            </div>
         </div>
-        <div class="field">
-            <label><span class="emoji">📄</span> Código Original Luau</label>
-            <textarea id="srcCode" rows="8" placeholder="-- Cole seu script aqui..."></textarea>
-            <div class="char-counter"><span id="charCount">0</span> caracteres</div>
+
+        <!-- Options Accordion / Checkboxes Grid -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-800/60 pb-2">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-indigo-400"></i> Módulos de Proteção Ativos
+                </h2>
+                <span class="text-xs text-slate-500">Configure as camadas de segurança individualmente</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+                <!-- Option 1: String Encryption -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optStrings" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Criptografia de Strings
+                            <span class="text-[10px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50">XOR + Byte</span>
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Codifica textos em arrays numéricos criptografados por chave aleatória.</p>
+                    </div>
+                </label>
+
+                <!-- Option 2: Variable Obfuscation -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optVariables" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Ofuscação de Identificadores
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Renomeia variáveis locais e funções por hashes hexadecimais (`_0x4a9e`).</p>
+                    </div>
+                </label>
+
+                <!-- Option 3: Anti-Tamper / Anti-Hooking -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optAntiTamper" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Anti-Hooking & Runtime Check
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Verifica integridade das funções nativas (`print`, `debug`, `getfenv`).</p>
+                    </div>
+                </label>
+
+                <!-- Option 4: Control Flow Flattening -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optControlFlow" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Control Flow & Junk Code
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Injeta condicionais opacas e operações matemáticas irrelevantes.</p>
+                    </div>
+                </label>
+
+                <!-- Option 5: Dynamic Loader / Unpacker -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optDynamicLoader" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Dynamic Loader (Virtualizer)
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Embala o payload final em um ambiente de execução `load / string.char` dinâmico.</p>
+                    </div>
+                </label>
+
+                <!-- Option 6: Minify Output -->
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer transition group">
+                    <input type="checkbox" id="optMinify" checked class="mt-1 rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-950">
+                    <div>
+                        <span class="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition flex items-center gap-1.5">
+                            Minificação Extrema
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">Remove todos os comentários, quebras de linha e espaços desnecessários.</p>
+                    </div>
+                </label>
+
+            </div>
         </div>
-        <div class="actions">
-            <button class="btn btn-primary" onclick="compilar()">
-                <span>🚀</span> Ofuscar
-            </button>
-            <button class="btn btn-outline" onclick="copiarOfuscado()">
-                <span>📋</span> Copiar Código
-            </button>
-            <button class="btn btn-outline" onclick="limpar()">
-                <span>🧹</span> Limpar
-            </button>
+
+        <!-- Code Editors Side-by-Side Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[480px]">
+
+            <!-- Input Source Editor Block -->
+            <div class="flex flex-col rounded-2xl border border-slate-800 bg-slate-950/90 overflow-hidden shadow-2xl">
+                <!-- Editor Header -->
+                <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-code text-cyan-400 text-sm"></i>
+                        <span class="text-xs font-semibold text-slate-200 uppercase tracking-wider">Código Lua Fonte (Entrada)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="srcCharCount" class="text-xs text-slate-500 font-mono">0 chars</span>
+                        <button id="btnPaste" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/60 transition" title="Colar da área de transferência">
+                            <i class="fa-solid fa-paste"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Textarea -->
+                <div class="relative flex-1">
+                    <textarea id="luaInput" spellcheck="false" placeholder="-- Insira seu script Lua aqui...
+function helloWorld(name)
+    local message = 'Olá, ' .. name .. '!'
+    print(message)
+    return message
+end
+
+helloWorld('Dev')
+" class="w-full h-full p-4 bg-transparent code-font text-xs sm:text-sm text-slate-200 resize-none focus:outline-none placeholder:text-slate-600 leading-relaxed"></textarea>
+                </div>
+            </div>
+
+            <!-- Output Obfuscated Editor Block -->
+            <div class="flex flex-col rounded-2xl border border-slate-800 bg-slate-950/90 overflow-hidden shadow-2xl relative">
+                <!-- Editor Header -->
+                <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-shield-cat text-purple-400 text-sm"></i>
+                        <span class="text-xs font-semibold text-slate-200 uppercase tracking-wider">Código Obfuscado (Saída)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btnCopy" class="text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copiar</span>
+                        </button>
+                        <button id="btnDownload" class="text-xs font-medium bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 px-3 py-1.5 rounded-lg border border-purple-500/40 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Baixar (.lua)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="relative flex-1">
+                    <textarea id="luaOutput" readonly spellcheck="false" placeholder="-- O código protegido aparecerá aqui após a ofuscação..." class="w-full h-full p-4 bg-transparent code-font text-xs text-emerald-400/90 resize-none focus:outline-none placeholder:text-slate-600 leading-relaxed"></textarea>
+                </div>
+
+                <!-- Stats Bar Footer -->
+                <div class="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-400 font-mono gap-2">
+                    <div class="flex items-center gap-4">
+                        <span>Tam. Orig: <strong id="statOrigSize" class="text-slate-200">0 B</strong></span>
+                        <span>Tam. Final: <strong id="statFinalSize" class="text-purple-400">0 B</strong></span>
+                        <span>Expansão: <strong id="statRatio" class="text-cyan-400">0%</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-amber-400 text-[10px]"></i>
+                        <span>Tempo: <strong id="statTime" class="text-slate-200">0 ms</strong></span>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <div class="field">
-            <label><span class="emoji">🔐</span> Código Ofuscado (Luau válido — roda direto)</label>
-            <textarea id="outCode" rows="14" readonly placeholder="O código ofuscado aparecerá aqui..."></textarea>
-            <div class="char-counter"><span id="outCount">0</span> caracteres</div>
-        </div>
-        <div class="footer">
-            🔒 Ofuscação 100% local · Sem <code>loadstring</code> · Luau válido direto
-        </div>
+
+    </main>
+
+    <!-- Notification Toast Container -->
+    <div id="toast" class="fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 text-sm shadow-2xl flex items-center gap-3 transition-all transform translate-y-20 opacity-0 pointer-events-none z-50">
+        <div id="toastIcon" class="text-cyan-400"><i class="fa-solid fa-circle-info"></i></div>
+        <span id="toastMsg">Mensagem do sistema</span>
     </div>
-</div>
-<script>
-function makeRNG(seed) {
-    let s = seed >>> 0;
-    if (s === 0) s = 1;
-    return function () {
-        s ^= s << 13; s >>>= 0;
-        s ^= s >>> 17;
-        s ^= s << 5;  s >>>= 0;
-        return s;
-    };
-}
-function makeNameGen(seed) {
-    const rng = makeRNG(seed);
-    const used = new Set();
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    return function () {
-        let name, tries = 0;
-        do {
-            name = "_";
-            const len = 6 + (rng() % 6);
-            for (let i = 0; i < len; i++) name += chars[rng() % chars.length];
-            tries++;
-        } while (used.has(name) && tries < 100);
-        if (used.has(name)) name = name + "_" + used.size;
-        used.add(name);
-        return name;
-    };
-}
-function tokenize(code) {
-    const tokens = [];
-    let i = 0;
-    const n = code.length;
-    const isIdStart = c => /[A-Za-z_]/.test(c);
-    const isId = c => /[A-Za-z0-9_]/.test(c);
-    const isDigit = c => /[0-9]/.test(c);
-    while (i < n) {
-        const c = code[i];
-        if (/\s/.test(c)) {
-            let j = i;
-            while (j < n && /\s/.test(code[j])) j++;
-            tokens.push({ t: 'ws', v: code.slice(i, j) });
-            i = j; continue;
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Custom Toast Notification System
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = message;
+            
+            if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+                toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-slate-900 border border-emerald-500/50 text-slate-200 text-sm shadow-2xl flex items-center gap-3 transition-all transform translate-y-0 opacity-100 z-50';
+            } else if (type === 'error') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
+                toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-slate-900 border border-rose-500/50 text-slate-200 text-sm shadow-2xl flex items-center gap-3 transition-all transform translate-y-0 opacity-100 z-50';
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info text-cyan-400"></i>';
+                toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-slate-900 border border-cyan-500/50 text-slate-200 text-sm shadow-2xl flex items-center gap-3 transition-all transform translate-y-0 opacity-100 z-50';
+            }
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
         }
-        if (c === '-' && code[i + 1] === '-') {
-            let j = i + 2;
-            let level = 0;
-            if (code[j] === '[') {
-                let k = j + 1;
-                while (code[k] === '=') { level++; k++; }
-                if (code[k] === '[') {
-                    const close = ']' + '='.repeat(level) + ']';
-                    let end = code.indexOf(close, k + 1);
-                    if (end === -1) end = n; else end += close.length;
-                    tokens.push({ t: 'comment', v: code.slice(i, end) });
-                    i = end; continue;
+
+        // Helper Bytes Formatting
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Preset Selector Handler
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetButtons.forEach(b => {
+                    b.classList.remove('active', 'bg-cyan-500/20', 'text-cyan-400', 'border', 'border-cyan-500/40');
+                    b.classList.add('text-slate-400');
+                });
+                btn.classList.add('active', 'bg-cyan-500/20', 'text-cyan-400', 'border', 'border-cyan-500/40');
+                btn.classList.remove('text-slate-400');
+
+                const preset = btn.dataset.preset;
+                applyPreset(preset);
+            });
+        });
+
+        function applyPreset(preset) {
+            const optStrings = document.getElementById('optStrings');
+            const optVariables = document.getElementById('optVariables');
+            const optAntiTamper = document.getElementById('optAntiTamper');
+            const optControlFlow = document.getElementById('optControlFlow');
+            const optDynamicLoader = document.getElementById('optDynamicLoader');
+            const optMinify = document.getElementById('optMinify');
+
+            if (preset === 'light') {
+                optStrings.checked = true;
+                optVariables.checked = true;
+                optAntiTamper.checked = false;
+                optControlFlow.checked = false;
+                optDynamicLoader.checked = false;
+                optMinify.checked = true;
+            } else if (preset === 'medium') {
+                optStrings.checked = true;
+                optVariables.checked = true;
+                optAntiTamper.checked = true;
+                optControlFlow.checked = true;
+                optDynamicLoader.checked = false;
+                optMinify.checked = true;
+            } else if (preset === 'extreme') {
+                optStrings.checked = true;
+                optVariables.checked = true;
+                optAntiTamper.checked = true;
+                optControlFlow.checked = true;
+                optDynamicLoader.checked = true;
+                optMinify.checked = true;
+            }
+            showToast(`Preset "${preset.toUpperCase()}" aplicado!`, 'info');
+        }
+
+        // Sample Code Loader
+        document.getElementById('btnLoadSample').addEventListener('click', () => {
+            const sampleLua = `-- Roblox & Standard Lua Security Script
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function verifyAccess(userKey)
+    local secretKey = "LUA_GUARD_SECURE_KEY_2026"
+    if userKey == secretKey then
+        print("[+] Acesso Autorizado para: " .. tostring(LocalPlayer))
+        return true
+    else
+        warn("[-] Acesso Negado: Chave Inválida")
+        return false
+    end
+end
+
+-- Test Exec
+verifyAccess("LUA_GUARD_SECURE_KEY_2026")`;
+            document.getElementById('luaInput').value = sampleLua;
+            updateInputCharCount();
+            showToast('Script de exemplo carregado!', 'info');
+        });
+
+        // Input Char Count Monitor
+        const luaInput = document.getElementById('luaInput');
+        const srcCharCount = document.getElementById('srcCharCount');
+
+        function updateInputCharCount() {
+            const count = luaInput.value.length;
+            srcCharCount.innerText = `${count} chars`;
+        }
+        luaInput.addEventListener('input', updateInputCharCount);
+
+        // Paste Button
+        document.getElementById('btnPaste').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                luaInput.value = text;
+                updateInputCharCount();
+                showToast('Conteúdo colado com sucesso!', 'success');
+            } catch (e) {
+                showToast('Não foi possível acessar a área de transferência', 'error');
+            }
+        });
+
+        // Clear Button
+        document.getElementById('btnClear').addEventListener('click', () => {
+            luaInput.value = '';
+            document.getElementById('luaOutput').value = '';
+            updateInputCharCount();
+            document.getElementById('statOrigSize').innerText = '0 B';
+            document.getElementById('statFinalSize').innerText = '0 B';
+            document.getElementById('statRatio').innerText = '0%';
+            document.getElementById('statTime').innerText = '0 ms';
+            showToast('Painel limpo', 'info');
+        });
+
+        // Copy Button
+        document.getElementById('btnCopy').addEventListener('click', () => {
+            const output = document.getElementById('luaOutput').value;
+            if (!output.trim()) {
+                showToast('Nenhum código para copiar!', 'error');
+                return;
+            }
+            
+            // Clipboard fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = output;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Código obfuscado copiado!', 'success');
+            } catch (err) {
+                showToast('Erro ao copiar código', 'error');
+            }
+            document.body.removeChild(textarea);
+        });
+
+        // Download Button
+        document.getElementById('btnDownload').addEventListener('click', () => {
+            const output = document.getElementById('luaOutput').value;
+            if (!output.trim()) {
+                showToast('Nenhum código para baixar!', 'error');
+                return;
+            }
+
+            const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `protected_script_${Date.now()}.lua`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Download iniciado!', 'success');
+        });
+
+        // --- LUA OBFUSCATION ENGINE ---
+        class LuaObfuscatorEngine {
+            constructor(options) {
+                this.options = options;
+                this.varMap = new Map();
+                this.varCounter = 0;
+            }
+
+            // Generate Random Hex Identifiers (_0x4a9e)
+            generateHexId() {
+                this.varCounter++;
+                const hash = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
+                return `_0x${hash}${this.varCounter.toString(16)}`;
+            }
+
+            // Obfuscate Strings via XOR Byte Arrays
+            encodeStrings(code) {
+                const xorKey = Math.floor(Math.random() * 180) + 20;
+
+                // Match single and double quoted strings (excluding comments)
+                return code.replace(/(["'])(?:(?=(\\?))\2[\s\S])*?\1/g, (match) => {
+                    // Extract inner string content
+                    const content = match.slice(1, -1);
+                    if (content.length === 0) return '""';
+
+                    // Convert to XOR encrypted bytes
+                    const bytes = [];
+                    for (let i = 0; i < content.length; i++) {
+                        bytes.push(content.charCodeAt(i) ^ xorKey);
+                    }
+
+                    // Generate dynamic decoder snippet
+                    const varKey = this.generateHexId();
+                    const varArr = this.generateHexId();
+                    const varRes = this.generateHexId();
+                    const varI = this.generateHexId();
+
+                    const byteStr = bytes.join(',');
+                    return `(function() local ${varKey}=${xorKey} local ${varArr}={${byteStr}} local ${varRes}="" for ${varI}=1,#${varArr} do ${varRes}=${varRes}..string.char(bit32 and bit32.bxor(${varArr}[${varI}],${varKey}) or (${varArr}[${varI}]>=${varKey} and ${varArr}[${varI}]-${varKey} or ${varArr}[${varI}]+${varKey})) end return ${varRes} end)()`;
+                });
+            }
+
+            // Obfuscate local variables, function names, and parameters
+            obfuscateIdentifiers(code) {
+                // Reserved Lua keywords & standard globals
+                const reserved = new Set([
+                    'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function',
+                    'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true',
+                    'until', 'while', 'print', 'warn', 'error', 'pairs', 'ipairs', 'next', 'type',
+                    'tostring', 'tonumber', 'string', 'table', 'math', 'bit32', 'bit', 'game',
+                    'script', 'Workspace', 'workspace', 'Players', 'GetService', 'Instance', 'Vector3', 'CFrame'
+                ]);
+
+                // Regex for local declarations and basic function arguments
+                const localPattern = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+                let match;
+
+                while ((match = localPattern.exec(code)) !== null) {
+                    const varName = match[1];
+                    if (!reserved.has(varName) && !this.varMap.has(varName) && varName.length > 1) {
+                        this.varMap.set(varName, this.generateHexId());
+                    }
                 }
+
+                // Replace mapped variables safely
+                this.varMap.forEach((newId, oldId) => {
+                    const reg = new RegExp(`\\b${oldId}\\b`, 'g');
+                    code = code.replace(reg, newId);
+                });
+
+                return code;
             }
-            let end = i;
-            while (end < n && code[end] !== '\n') end++;
-            tokens.push({ t: 'comment', v: code.slice(i, end) });
-            i = end; continue;
-        }
-        if (c === '[') {
-            let k = i + 1;
-            let level = 0;
-            while (code[k] === '=') { level++; k++; }
-            if (code[k] === '[') {
-                const close = ']' + '='.repeat(level) + ']';
-                let end = code.indexOf(close, k + 1);
-                if (end === -1) end = n; else end += close.length;
-                const content = code.slice(k + 1, end - close.length);
-                tokens.push({ t: 'str', v: content, q: 'long' });
-                i = end; continue;
+
+            // Inject Anti-Tamper / Anti-Hooking / Integrity Checks
+            injectAntiTamper(code) {
+                const varCheck = this.generateHexId();
+                const varEnv = this.generateHexId();
+
+                const antiHookHeader = `local ${varEnv}=getfenv and getfenv() or _ENV
+if not ${varEnv} or type(print) ~= "function" or type(string.char) ~= "function" then
+    while true do end
+end
+local ${varCheck}=function()
+    if tostring(print) == nil or tostring(string.char) == nil then
+        while true do end
+    end
+end
+${varCheck}()
+`;
+                return antiHookHeader + code;
             }
-        }
-        if (c === '"' || c === "'") {
-            const q = c;
-            let j = i + 1, val = "";
-            while (j < n) {
-                if (code[j] === '\\') {
-                    val += code[j] + (code[j + 1] || '');
-                    j += 2; continue;
+
+            // Inject Control Flow Flattening / Junk Code
+            injectControlFlow(code) {
+                const junkVar1 = this.generateHexId();
+                const junkVar2 = this.generateHexId();
+
+                const junkBlock = `
+local ${junkVar1} = ${Math.floor(Math.random() * 9000 + 1000)}
+local ${junkVar2} = ${Math.floor(Math.random() * 9000 + 1000)}
+if (${junkVar1} * ${junkVar2}) == -1 then
+    print("Junk dead branch reached")
+end
+`;
+                // Split lines and inject junk blocks at random points
+                const lines = code.split('\n');
+                if (lines.length > 3) {
+                    const midIndex = Math.floor(lines.length / 2);
+                    lines.splice(midIndex, 0, junkBlock);
+                } else {
+                    lines.unshift(junkBlock);
                 }
-                if (code[j] === q) { j++; break; }
-                val += code[j];
-                j++;
+
+                return lines.join('\n');
             }
-            tokens.push({ t: 'str', v: val, q });
-            i = j; continue;
-        }
-        if (isDigit(c) || (c === '.' && isDigit(code[i + 1]))) {
-            let j = i;
-            while (j < n && /[0-9a-fA-FxX._]/.test(code[j])) j++;
-            tokens.push({ t: 'num', v: code.slice(i, j) });
-            i = j; continue;
-        }
-        if (isIdStart(c)) {
-            let j = i;
-            while (j < n && isId(code[j])) j++;
-            tokens.push({ t: 'id', v: code.slice(i, j) });
-            i = j; continue;
-        }
-        const two = code.slice(i, i + 2);
-        const ops2 = ['==', '~=', '<=', '>=', '..', '->', '::', '//', '<<', '>>'];
-        if (ops2.includes(two)) {
-            tokens.push({ t: 'op', v: two });
-            i += 2; continue;
-        }
-        tokens.push({ t: 'op', v: c });
-        i++;
-    }
-    return tokens;
-}
-function unescapeLuaString(s) {
-    let out = '';
-    for (let i = 0; i < s.length; i++) {
-        if (s[i] === '\\' && i + 1 < s.length) {
-            const n = s[i + 1];
-            if (n === 'n') { out += '\n'; i++; continue; }
-            if (n === 't') { out += '\t'; i++; continue; }
-            if (n === 'r') { out += '\r'; i++; continue; }
-            if (n === '\\' || n === '"' || n === "'") { out += n; i++; continue; }
-            if (n === 'a') { out += '\x07'; i++; continue; }
-            if (n === 'b') { out += '\b'; i++; continue; }
-            if (n === 'f') { out += '\f'; i++; continue; }
-            if (n === 'v') { out += '\v'; i++; continue; }
-            if (/[0-9]/.test(n)) {
-                let j = i + 1, num = '';
-                while (j < s.length && /[0-9]/.test(s[j]) && num.length < 3) { num += s[j]; j++; }
-                out += String.fromCharCode(parseInt(num, 10) & 0xFF);
-                i = j - 1; continue;
+
+            // Minify Code (Remove comments & unnecessary spaces)
+            minify(code) {
+                // Remove single line comments
+                code = code.replace(/--[^\r\n]*/g, '');
+                // Remove multi line comments
+                code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
+                // Collapse whitespaces
+                code = code.replace(/\s+/g, ' ');
+                return code.trim();
             }
-            if (n === 'x' && i + 3 < s.length) {
-                const hex = s.slice(i + 2, i + 4);
-                if (/[0-9a-fA-F]{2}/.test(hex)) {
-                    out += String.fromCharCode(parseInt(hex, 16));
-                    i += 3; continue;
+
+            // Dynamic Loader / Virtualizer Wrapper
+            wrapDynamicLoader(code) {
+                // Convert full obfuscated code into byte array
+                const bytes = [];
+                for (let i = 0; i < code.length; i++) {
+                    bytes.push(code.charCodeAt(i));
                 }
+
+                const varByteArr = this.generateHexId();
+                const varBuf = this.generateHexId();
+                const varI = this.generateHexId();
+                const varLoad = this.generateHexId();
+
+                const wrapped = `local ${varByteArr}={${bytes.join(',')}}
+local ${varBuf}=""
+for ${varI}=1,#${varByteArr} do
+    ${varBuf}=${varBuf}..string.char(${varByteArr}[${varI}])
+end
+local ${varLoad}=loadstring or load
+if ${varLoad} then
+    return ${varLoad}(${varBuf})()
+else
+    error("Dynamic loader require load string execution environment")
+end`;
+                return wrapped;
             }
-            out += s[i];
-        } else {
-            out += s[i];
-        }
-    }
-    return out;
-}
-function ofuscar(code) {
-    if (!code.trim()) throw new Error("Código vazio.");
-    const tokens = tokenize(code);
-    let seed = 7;
-    for (let i = 0; i < code.length; i++) seed = (Math.imul(seed, 31) + code.charCodeAt(i)) >>> 0;
-    if (seed === 0) seed = 1;
-    const rng = makeRNG(seed);
-    const novoNome = makeNameGen(seed ^ 0x9E3779B9);
-    const RESERVED = new Set([
-        'and','break','do','else','elseif','end','false','for','function','if','in',
-        'local','nil','not','or','repeat','return','then','true','until','while',
-        'continue','type','export','typeof','self',
-        'game','workspace','script','Instance','Vector3','Vector2','CFrame','Color3',
-        'BrickColor','UDim','UDim2','Enum','Ray','Region3','NumberRange','NumberSequence',
-        'ColorSequence','Rect','TweenInfo','Faces','Axes','PhysicalProperties','Random',
-        'task','wait','spawn','delay','tick','time','print','warn','error','assert',
-        'pcall','xpcall','select','tostring','tonumber','setmetatable','getmetatable',
-        'rawget','rawset','rawequal','rawlen','next','pairs','ipairs','unpack',
-        'table','string','math','os','io','coroutine','bit32','utf8','debug','bit',
-        'loadstring','load','require','getfenv','setfenv','getgenv','getrenv',
-        'Players','LocalPlayer','Character','CharacterAdded','WaitForChild','Parent',
-        'Connect','new','FindFirstChild','GetService','Name','UserId','PlayerGui',
-        'Backpack','Camera','CurrentCamera','Humanoid','Head','Torso','RootPart',
-        'Position','Size','Transparency','CanCollide','Anchored','Material','Color',
-        'Value','Enabled','Visible','Text','Image','Mouse','Keyboard','UserInputService',
-        'TweenService','Debris','ReplicatedStorage','ServerStorage','ServerScriptService',
-        'StarterGui','StarterPack','Lighting','SoundService','Chat','Teams',
-        'TeleportService','DataStoreService','MarketplaceService','HttpService',
-        'PathfindingService','CollectionService','ContextActionService','GuiService',
-        'RunService','Heartbeat','RenderStepped','Stepped','Clone','Destroy',
-        'GetChildren','GetDescendants','IsA','FindFirstChildOfClass','GetAttribute',
-        'SetAttribute','Changed','AncestryChanged','ChildAdded','ChildRemoved',
-        'Touched','TouchEnded','GetMouse','GetPlayers','GetPlayerFromCharacter',
-        'CharacterRemoving','Chatted','Kick','LoadCharacter','FireServer','OnServerEvent',
-        'OnClientEvent','InvokeServer','Fire','Disconnect','Wait','Once',
-        'IsDescendantOf','GetFullName','insert','remove','find','sort','concat',
-        'create','pack','clear','byte','char','format','gmatch','gsub','len','lower',
-        'match','rep','reverse','sub','upper','split','abs','acos','asin','atan',
-        'atan2','ceil','clamp','cos','deg','exp','floor','fmod','huge','log','max',
-        'min','modf','noise','pi','pow','rad','random','randomseed','round','sign',
-        'sin','sqrt','tan','clock','date','difftime','resume','running',
-        'status','wrap','yield','arshift','band','bnot','bor','btest','bxor',
-        'extract','lrotate','lshift','replace','rrotate','rshift','Workspace'
-    ]);
-    const mapa = new Map();
-    let prevSignificant = null;
-    for (const tk of tokens) {
-        if (tk.t === 'ws' || tk.t === 'comment') continue;
-        if (tk.t === 'id') {
-            const isProperty = prevSignificant && prevSignificant.t === 'op' && (prevSignificant.v === '.' || prevSignificant.v === ':');
-            if (!isProperty && !RESERVED.has(tk.v) && !mapa.has(tk.v)) {
-                mapa.set(tk.v, novoNome());
+
+            // Process Pipeline
+            obfuscate(sourceCode) {
+                let code = sourceCode;
+
+                if (this.options.antiTamper) {
+                    code = this.injectAntiTamper(code);
+                }
+
+                if (this.options.controlFlow) {
+                    code = this.injectControlFlow(code);
+                }
+
+                if (this.options.variables) {
+                    code = this.obfuscateIdentifiers(code);
+                }
+
+                if (this.options.strings) {
+                    code = this.encodeStrings(code);
+                }
+
+                if (this.options.minify) {
+                    code = this.minify(code);
+                }
+
+                if (this.options.dynamicLoader) {
+                    code = this.wrapDynamicLoader(code);
+                }
+
+                return code;
             }
         }
-        prevSignificant = tk;
-    }
-    function numOfuscado(n) {
-        const a = (rng() % 300) + 1;
-        const b = a + n;
-        return '(' + b + '-' + a + ')';
-    }
-    function strOfuscada(raw) {
-        const s = unescapeLuaString(raw);
-        if (s.length === 0) return '""';
-        const key = (rng() % 200) + 20;
-        const rot = (rng() % 5) + 1;
-        const bytes = [];
-        for (let i = 0; i < s.length; i++) {
-            let v = s.charCodeAt(i) & 0xFF;
-            v = (v + key) & 0xFF;
-            v = ((v << rot) | (v >>> (8 - rot))) & 0xFF;
-            bytes.push(v);
-        }
-        const tn = novoNome();
-        const rn = novoNome();
-        const kn = novoNome();
-        const iname = novoNome();
-        const vn = novoNome();
-        return '(function()'
-            + ' local ' + tn + '={' + bytes.join(',') + '};'
-            + ' local ' + rn + '={};'
-            + ' local ' + kn + '=' + numOfuscado(key) + ';'
-            + ' for ' + iname + '=1,#' + tn + ' do'
-            + ' local ' + vn + '=' + tn + '[' + iname + '];'
-            + ' ' + vn + '=bit32.bor(bit32.rshift(' + vn + ',' + numOfuscado(rot) + '),bit32.lshift(' + vn + ',' + numOfuscado(8 - rot) + '));'
-            + ' ' + vn + '=bit32.band(' + vn + '-' + kn + ',255);'
-            + ' ' + rn + '[' + iname + ']=string.char(' + vn + ');'
-            + ' end;'
-            + ' return table.concat(' + rn + ');'
-            + ' end)()';
-    }
-    const lines = [];
-    lines.push('-- [[ Power X Hub v1 · fixed ]]');
-    lines.push('local bit32 = bit32 or bit');
-    let out = '';
-    prevSignificant = null;
-    for (let i = 0; i < tokens.length; i++) {
-        const tk = tokens[i];
-        if (tk.t === 'comment') continue;
-        if (tk.t === 'ws') { out += tk.v; continue; }
-        if (tk.t === 'str') { out += strOfuscada(tk.v); prevSignificant = tk; continue; }
-        if (tk.t === 'num') {
-            const num = parseFloat(tk.v);
-            const isPlainInt = !isNaN(num) && num === Math.floor(num) && Math.abs(num) < 10000 && !/[xX.]/.test(tk.v);
-            if (isPlainInt) out += numOfuscado(num);
-            else out += tk.v;
-            prevSignificant = tk; continue;
-        }
-        if (tk.t === 'id') {
-            const isProperty = prevSignificant && prevSignificant.t === 'op' && (prevSignificant.v === '.' || prevSignificant.v === ':');
-            if (!isProperty && mapa.has(tk.v) && tk.v !== 'self') out += mapa.get(tk.v);
-            else out += tk.v;
-            prevSignificant = tk; continue;
-        }
-        out += tk.v;
-        prevSignificant = tk;
-    }
-    lines.push(out);
-    for (let d = 0; d < 3; d++) {
-        const dn = novoNome();
-        lines.push('if false then local ' + dn + '=' + numOfuscado(rng() % 1000) + ' end');
-    }
-    return lines.join('\n');
-}
-const alertDiv = document.getElementById('alert');
-const alertIcon = document.getElementById('alertIcon');
-const alertMsg  = document.getElementById('alertMsg');
-const srcCode   = document.getElementById('srcCode');
-const outCode   = document.getElementById('outCode');
-const charCount = document.getElementById('charCount');
-const outCount  = document.getElementById('outCount');
-srcCode.addEventListener('input', () => charCount.textContent = srcCode.value.length);
-function mostrarAlerta(msg, tipo, tempo) {
-    if (tipo === undefined) tipo = 'info';
-    if (tempo === undefined) tempo = 5000;
-    alertDiv.className = 'alert show';
-    alertIcon.textContent = tipo === 'error' ? '❌' : '✅';
-    alertMsg.textContent = msg;
-    if (tipo === 'error') alertDiv.classList.add('error');
-    else alertDiv.classList.remove('error');
-    clearTimeout(window._alertTimer);
-    if (tempo > 0) window._alertTimer = setTimeout(function(){ alertDiv.className = 'alert'; }, tempo);
-}
-function compilar() {
-    const codigo = srcCode.value;
-    if (!codigo.trim()) return mostrarAlerta('Cole um script primeiro.', 'error');
-    try {
-        const out = ofuscar(codigo);
-        outCode.value = out;
-        outCount.textContent = out.length;
-        mostrarAlerta('✅ Ofuscado com sucesso!', 'info', 5000);
-    } catch (e) {
-        mostrarAlerta('Erro: ' + e.message, 'error');
-    }
-}
-function copiarOfuscado() {
-    if (!outCode.value) return mostrarAlerta('Nada para copiar.', 'error');
-    navigator.clipboard.writeText(outCode.value).then(function(){
-        mostrarAlerta('📋 Copiado!', 'info', 3000);
-    }).catch(function(){ mostrarAlerta('Falha ao copiar.', 'error'); });
-}
-function limpar() {
-    srcCode.value = '';
-    outCode.value = '';
-    charCount.textContent = '0';
-    outCount.textContent = '0';
-    alertDiv.className = 'alert';
-}
-srcCode.value = '-- Exemplo\nlocal player = game.Players.LocalPlayer\nprint("Hello, " .. player.Name)';
-charCount.textContent = srcCode.value.length;
-</script>
+
+        // Trigger Obfuscation Process
+        document.getElementById('btnObfuscate').addEventListener('click', () => {
+            const inputCode = document.getElementById('luaInput').value;
+
+            if (!inputCode.trim()) {
+                showToast('Por favor, insira um código Lua para obfuscar!', 'error');
+                return;
+            }
+
+            const startTime = performance.now();
+
+            const options = {
+                strings: document.getElementById('optStrings').checked,
+                variables: document.getElementById('optVariables').checked,
+                antiTamper: document.getElementById('optAntiTamper').checked,
+                controlFlow: document.getElementById('optControlFlow').checked,
+                dynamicLoader: document.getElementById('optDynamicLoader').checked,
+                minify: document.getElementById('optMinify').checked
+            };
+
+            try {
+                const engine = new LuaObfuscatorEngine(options);
+                const obfuscatedCode = engine.obfuscate(inputCode);
+                
+                const endTime = performance.now();
+                const executionTime = (endTime - startTime).toFixed(1);
+
+                document.getElementById('luaOutput').value = obfuscatedCode;
+
+                // Update Statistics
+                const origBytes = new Blob([inputCode]).size;
+                const finalBytes = new Blob([obfuscatedCode]).size;
+                const ratio = origBytes > 0 ? ((finalBytes / origBytes) * 100).toFixed(0) : 0;
+
+                document.getElementById('statOrigSize').innerText = formatBytes(origBytes);
+                document.getElementById('statFinalSize').innerText = formatBytes(finalBytes);
+                document.getElementById('statRatio').innerText = `${ratio}%`;
+                document.getElementById('statTime').innerText = `${executionTime} ms`;
+
+                showToast('Código Lua obfuscado com sucesso!', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao processar a ofuscação do código', 'error');
+            }
+        });
+
+        // Initialize view
+        updateInputCharCount();
+    </script>
 </body>
 </html>
